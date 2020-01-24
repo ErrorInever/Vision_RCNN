@@ -1,7 +1,7 @@
 import argparse
 import torch
 import torchvision
-
+import os
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Faster-RCNN')
@@ -26,6 +26,9 @@ if __name__ == '__main__':
     args = parse_args()
     print('Called with args:{}'.format(args.__dict__))
 
+    if not os.path.exists(args.outdir):
+        os.makedirs('output')
+
     if args.images is args.video:
         raise RuntimeError('path to images and videos not specified')
 
@@ -36,7 +39,6 @@ if __name__ == '__main__':
     print('Using device:{}'.format(device))
 
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, progress=True)
-
 
     if args.images:
         pass
