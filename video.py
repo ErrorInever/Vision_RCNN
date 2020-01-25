@@ -4,24 +4,11 @@ from datetime import datetime
 import utils
 
 
-# class Converter:
-#     """Converting video frames to images, and vice versa"""
-#     @staticmethod
-#     def get_frame(self, video):
-#         if not isinstance(video, Video):
-#             raise TypeError('get wrong type: {}'.format(type(video)))
-#         else:
-#             while video.cap.isOpened():
-#                 ret, frame = video.cap.read()
-#                 if ret:
-#                     yield frame
-#
-#     def images_to_video(self, images):
-#         pass
-
 # TODO: release decorator to track time
+
 class Video:
     """ Defines a video"""
+
     def __init__(self, video_path, save_path):
         """
         :param video_path: path to a video file
@@ -35,19 +22,19 @@ class Video:
                                   int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.duration = self.__len__() / self.fps
-        self.out = cv2.VideoWriter(self.save_path, self.fourcc, (self.width, self.height))
+        self.out = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.width, self.height))
 
     def __str__(self):
-        info = 'duration:{}: frames:{}|resolution:{}x{}|fps:{}'.format(self.duration, self.__len__(),
-                                                                       self.width, self.height, self.fps)
+        info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1), self.__len__(),
+                                                                            self.width, self.height, round(self.fps, 1))
         return info
 
     def __len__(self):
-        """ total number of frame"""
+        """ total number of frames"""
         return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     def get_frame(self):
-        """return generator frame by frame"""
+        """convert frame to tensor and return object of generator frame by frame"""
         while self.cap.isOpened():
             ret, frame = self.cap.read()
             if ret:
