@@ -6,7 +6,7 @@ def frame_to_tensor(frame):
     """
     convert frame to tensor
     :param frame: frame of video
-    :return: list
+    :return: 3R tensor
     """
     frame = torch.from_numpy(frame).float() / 255.0
     frame = frame.permute(2, 0, 1)
