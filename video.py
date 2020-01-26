@@ -5,7 +5,7 @@ import utils
 
 
 # TODO: release decorator to track time
-
+# TODO: release batchs frames
 class Video:
     """ Defines a video"""
 
@@ -25,8 +25,10 @@ class Video:
         self.out = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.width, self.height))
 
     def __str__(self):
-        info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1), self.__len__(),
-                                                                            self.width, self.height, round(self.fps, 1))
+        info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
+                                                                             self.__len__(),
+                                                                             self.width, self.height,
+                                                                             round(self.fps, 1))
         return info
 
     def __len__(self):

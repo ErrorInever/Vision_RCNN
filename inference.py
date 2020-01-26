@@ -2,7 +2,8 @@ import argparse
 import torch
 import torchvision
 import os
-
+from detector import Detector
+# TODO: add logging and unittest
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Faster-RCNN')
@@ -14,6 +15,9 @@ def parse_args():
     parser.add_argument('--outdir', dest='outdir',
                         help='directory to save results, default save to /output',
                         default='output', type=str)
+
+    #parser.add_argument('--bbox', dest='bbox', help='draw bounding box around objects', action='store_true')
+    #parser.add_argument('--segment', dest='segment', help='draw border around objects', action='store_true')
 
     parser.add_argument('--use_gpu', dest='use_gpu',
                         help='whether use GPU, if the GPU is unavailable then the CPU will be used',
@@ -40,10 +44,13 @@ if __name__ == '__main__':
     print('Using device:{}'.format(device))
 
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, progress=True)
+    model.to(device)
+    model.eval()
 
-    if args.images:
-        pass
-    elif args.videos:
-        pass
-    else:
-        raise RuntimeError('Something went wrong...')
+    detector = Detector(model, device, args.images, args.outdir)
+    # if args.images:
+    #     pass
+    # elif args.videos:
+    #     pass
+    # else:
+    #     raise RuntimeError('Something went wrong...')

@@ -1,6 +1,6 @@
 import torch
-import numpy as np
-
+import cv2
+import os
 
 def frame_to_tensor(frame):
     """
@@ -13,3 +13,16 @@ def frame_to_tensor(frame):
     # TODO: release batchs
     # FIXME: possible need return list of frame
     return frame
+
+
+def collate_fn(batch):
+    return tuple(batch)
+
+
+def get_classes():
+    """ return dictionary of classes"""
+    PATH = 'coco2017_classes/coco-labels-2014_2017.txt'
+    with open(PATH) as f:
+        classes = f.read().splitlines()
+        classes = dict(zip(classes, [x for x in range(1, 81)]))
+    return classes
