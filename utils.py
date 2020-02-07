@@ -2,6 +2,7 @@ import torch
 import cv2
 import os
 
+
 def frame_to_tensor(frame):
     """
     convert frame to tensor
@@ -24,5 +25,6 @@ def get_classes():
     PATH = 'coco2017_classes/coco-labels-2014_2017.txt'
     with open(PATH) as f:
         classes = f.read().splitlines()
-        classes = dict(zip(classes, [x for x in range(1, 81)]))
+        classes = dict(zip([x for x in range(1, 81)], classes))
     return classes
+
