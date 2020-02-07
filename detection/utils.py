@@ -22,7 +22,7 @@ def collate_fn(batch):
 
 def get_classes():
     """ return dictionary of classes"""
-    PATH = 'coco2017_classes/coco-labels-2014_2017.txt'
+    PATH = '../config/classes/coco-labels-2014_2017.txt'
     with open(PATH) as f:
         classes = f.read().splitlines()
         classes = dict(zip([x for x in range(1, 81)], classes))

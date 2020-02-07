@@ -1,10 +1,9 @@
-import utils
+from detection import utils
 import torch
 import os
 import cv2
-from images import Images
+from detection.images import Images
 from torch.utils.data import DataLoader
-from datetime import datetime
 from tqdm import tqdm
 
 CLASSES = utils.get_classes()
@@ -12,7 +11,7 @@ CLASSES = utils.get_classes()
 
 def filter_suppression(detects, treshhold):
     """
-    Remove boxes,labels which score < treshhold
+    Removes predictions which scores < treshhold
     :param detects: list of dictionary
     :param treshhold: float
     :return: list of dictionary
@@ -30,15 +29,6 @@ def filter_suppression(detects, treshhold):
         samples.append(sample)
 
     return samples
-
-
-def filter_labels(labels):
-    mask = utils.get_classes()
-    classes = []
-    for label in labels:
-        classes.append(mask[label])
-
-    return classes
 
 
 def draw_graphics(img, detect):

@@ -2,7 +2,7 @@ import argparse
 import torch
 import torchvision
 import os
-from detector import Detector
+from detection.detector import Detector
 # TODO: add logging and unittest
 
 
