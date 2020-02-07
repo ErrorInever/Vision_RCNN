@@ -5,6 +5,7 @@ import os
 from detector import Detector
 # TODO: add logging and unittest
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Faster-RCNN')
     parser.add_argument('--images', dest='images', help='Path to directory where images stored',
@@ -33,6 +34,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(args.outdir):
         os.makedirs('output')
+        args.outdir = 'output'
 
     if args.images is args.video:
         raise RuntimeError('path to images and videos not specified')
@@ -47,7 +49,7 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
 
-    detector = Detector(model, device, args.images, args.outdir)
+    detector = Detector(model, device, args.outdir, args.images)
     # if args.images:
     #     pass
     # elif args.videos:
