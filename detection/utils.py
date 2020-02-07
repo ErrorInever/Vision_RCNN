@@ -1,6 +1,4 @@
 import torch
-import cv2
-import os
 
 
 def frame_to_tensor(frame):

@@ -1,10 +1,11 @@
-from detection import utils
 import torch
 import os
 import cv2
-from detection.images import Images
+from detection import utils
+from detection.dataset import Images
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from cls import Detect
 
 CLASSES = utils.get_classes()
 
@@ -61,15 +62,12 @@ def draw_graphics(img, detect):
     return img
 
 
-class Detector:
+class Detector(Detect):
 
-    def __init__(self, model, device, out_path, treshhold=0.7):
-        self.model = model
-        self.device = device
-        self.treshhold = treshhold
-        self.out_path = out_path
+    def __init__(self, model, device):
+        super().__init__(model, device)
 
-    def detect_on_images(self, img_path):
+    def detect_on_images(self, img_path, out_path, treshhold=0.7):
         img_dataset = Images(img_path)
         dataloader = DataLoader(img_dataset, batch_size=10, num_workers=4, shuffle=False, collate_fn=utils.collate_fn)
 
@@ -78,15 +76,15 @@ class Detector:
 
             with torch.no_grad():
                 detects = self.model(images)
-                detects = filter_suppression(detects, self.treshhold)
+                detects = filter_suppression(detects, treshhold)
 
             img_rect = []
             for i, detect in enumerate(detects):
                 img_rect.append(draw_graphics(images[i], detect))
 
             for i, img in enumerate(img_rect):
-                save_path = os.path.join(self.out_path, 'detection_{}.png'.format(i))
+                save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-    def detect_on_video(self):
+    def detect_on_video(self, vid_path, out_path, treshhold=0.7):
         pass
