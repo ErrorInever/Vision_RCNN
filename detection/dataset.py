@@ -67,6 +67,13 @@ class Video:
         """convert frame to tensor and return object of generator frame by frame"""
         while self.cap.isOpened():
             ret, frame = self.cap.read()
+
             if ret:
+                if cv2.waitKey(1) % 0xFF == ord('q'):
+                    break
                 frame = utils.frame_to_tensor(frame)
-                yield frame
+                yield [frame]
+            else:
+                break
+        self.cap.release()
+

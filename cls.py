@@ -9,9 +9,9 @@ class Detect(ABC):
         super().__init__()
 
     @abstractmethod
-    def detect_on_images(self, img_path, out_path, treshhold):
+    def detect_on_images(self, data_path, out_path, treshhold):
         pass
 
     @abstractmethod
-    def detect_on_video(self, vid_path, out_path, treshhold):
+    def detect_on_video(self, data_path, out_path, treshhold):
         pass
