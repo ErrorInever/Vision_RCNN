@@ -13,6 +13,7 @@ class Images(Dataset):
     """
 
     def __init__(self, img_path):
+        """:param img_path: path to images directory"""
         self.img_path = img_path
         self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
 
@@ -28,14 +29,14 @@ class Images(Dataset):
 
     @property
     def img_to_tensor(self):
-        """Convert an image to a tensor"""
+        """Convert an image to tensor"""
         return transforms.Compose([transforms.ToTensor()])
 
 
 class Video:
     # TODO: release decorator to track time
     # TODO: release batchs frames
-    """ Defines a video"""
+    """ Defines a video container"""
 
     def __init__(self, video_path, save_path):
         """
@@ -60,7 +61,7 @@ class Video:
         return info
 
     def __len__(self):
-        """ total number of frames"""
+        """ total number of video frames"""
         return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     def get_frame(self):
@@ -76,4 +77,3 @@ class Video:
             else:
                 break
         self.cap.release()
-
