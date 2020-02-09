@@ -10,19 +10,21 @@ from cls import Detect
 
 CLASSES = utils.get_classes()
 
+# TODO: refactoring, color classes, dynamic text size
 
-def filter_treshold(detects, treshhold):
+
+def filter_threshold(detects, threshold):
     """
     Removes predictions which scores < treshhold
     :param detects: list of dictionary
-    :param treshhold: float
+    :param threshold: float
     :return: list of dictionary
     """
     samples = []
 
     for detect in detects:
         scores = detect['scores']
-        mask = len(list(filter(lambda x: x >= treshhold, scores)))
+        mask = len(list(filter(lambda x: x >= threshold, scores)))
 
         sample = {'boxes': detect['boxes'][:mask],
                   'labels': detect['labels'][:mask],
@@ -64,11 +66,17 @@ def draw_bbox(img, prediction):
 
 
 class Detector(Detect):
-    """bounding box detector"""
+    """object detector"""
     def __init__(self, model, device):
         super().__init__(model, device)
 
-    def detect_on_images(self, img_path, out_path, treshhold=0.7):
+    def detect_on_images(self, img_path, out_path, threshold=0.7):
+        """
+        Detects objects on images and saves it
+        :param img_path: path to images data
+        :param out_path: path to output results
+        :param threshold: threshold detection
+        """
         img_dataset = Images(img_path)
         dataloader = DataLoader(img_dataset, batch_size=10, num_workers=4, shuffle=False, collate_fn=utils.collate_fn)
 
@@ -78,7 +86,7 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            predictions = filter_treshold(predictions, treshhold)
+            predictions = filter_threshold(predictions, threshold)
 
             img_rect = []
             for i, predict in enumerate(predictions):
@@ -88,7 +96,13 @@ class Detector(Detect):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-    def detect_on_video(self, data_path, out_path, treshhold=0.7):
+    def detect_on_video(self, data_path, out_path, threshold=0.7):
+        """
+        Detects objects on video and saves it
+        :param data_path: path to video
+        :param out_path: path to output result
+        :param threshold: threshold detection
+        """
         video = Video(data_path, out_path)
         print(video)
 
@@ -98,7 +112,7 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(frames)
 
-            predictions = filter_treshold(predictions, treshhold)
+            predictions = filter_threshold(predictions, threshold)
 
             img_rect = []
             for i, predict in enumerate(predictions):
@@ -109,4 +123,4 @@ class Detector(Detect):
                 video.out.write(img)
 
         video.out.release()
-        print('detect video saves to {}'.format(video.save_path))
+        print('Done. Detect video saves to {}'.format(video.save_path))
