@@ -17,6 +17,10 @@ def filter_threshold(detects, threshold):
     """
     Removes predictions which scores < treshhold
     :param detects: list of dictionary
+    [{boxes: [[x1, y1, x2, y2], ...],
+     scores: [float],
+     labels: [int],
+     , ...]
     :param threshold: float
     :return: list of dictionary
     """
@@ -36,7 +40,13 @@ def filter_threshold(detects, threshold):
 
 
 def draw_bbox(img, prediction):
-    """ draws bounding boxes, scores and classes on image"""
+    """ draws bounding boxes, scores and classes on image
+    :param img: tensor
+    :param prediction: dictionary
+    {boxes: [[x1, y1, x2, y2], ...],
+     scores: [float],
+     labels: [int]}
+    """
     img = img.permute(1, 2, 0).cpu().numpy().copy()
     img = img * 255
     boxes = prediction['boxes'].cpu()
@@ -68,6 +78,10 @@ def draw_bbox(img, prediction):
 class Detector(Detect):
     """object detector"""
     def __init__(self, model, device):
+        """
+        :param model: instance of net
+        :param device: can be cpu or cuda device
+        """
         super().__init__(model, device)
 
     def detect_on_images(self, img_path, out_path, threshold=0.7):
