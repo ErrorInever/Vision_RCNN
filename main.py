@@ -18,8 +18,7 @@ def parse_args():
                         help='whether use GPU, if the GPU is unavailable then the CPU will be used',
                         action='store_true')
     parser.print_help()
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
