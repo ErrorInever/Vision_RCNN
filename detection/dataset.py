@@ -34,7 +34,6 @@ class Images(Dataset):
 
 
 class Video:
-    # TODO: release decorator to track time
     # TODO: release batchs frames
     """ Defines a video container"""
 

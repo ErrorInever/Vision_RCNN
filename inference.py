@@ -49,10 +49,11 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
 
-    detector = Detector(model, device, args.outdir, args.images)
-    # if args.images:
-    #     pass
-    # elif args.videos:
-    #     pass
-    # else:
-    #     raise RuntimeError('Something went wrong...')
+    detector = Detector(model, device)
+
+    if args.images:
+        detector.detect_on_images(args.images, args.outdir)
+    elif args.videos:
+        detector.detect_on_video(args.video, args.outdir)
+    else:
+        raise RuntimeError('Something went wrong...')

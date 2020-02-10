@@ -2,6 +2,7 @@ import torch
 import os
 import cv2
 import numpy as np
+from datetime import datetime
 from detection import utils
 from detection.dataset import Images, Video
 from torch.utils.data import DataLoader
@@ -75,6 +76,15 @@ def draw_bbox(img, prediction):
     return img
 
 
+def get_all_time(func):
+    def wrapped(*args, **kwargs):
+        start_time = datetime.now()
+        res = func(*args, **kwargs)
+        print('wasted time = {}'.format((datetime.now() - start_time).total_seconds()))
+        return res
+    return wrapped
+
+
 class Detector(Detect):
     """object detector"""
     def __init__(self, model, device):
@@ -84,6 +94,7 @@ class Detector(Detect):
         """
         super().__init__(model, device)
 
+    @get_all_time
     def detect_on_images(self, img_path, out_path, threshold=0.7):
         """
         Detects objects on images and saves it
@@ -110,6 +121,7 @@ class Detector(Detect):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
+    @get_all_time
     def detect_on_video(self, data_path, out_path, threshold=0.7):
         """
         Detects objects on video and saves it
@@ -135,6 +147,5 @@ class Detector(Detect):
             for i, img in enumerate(img_rect):
                 img = np.uint8(img)
                 video.out.write(img)
-
         video.out.release()
         print('Done. Detect video saves to {}'.format(video.save_path))
