@@ -8,10 +8,7 @@ from detection import utils
 
 
 class Images(Dataset):
-    """
-    Container for images
-    """
-
+    """Container for images"""
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
         self.img_path = img_path
@@ -34,9 +31,7 @@ class Images(Dataset):
 
 
 class Video:
-    # TODO: release batchs frames
-    """ Defines a video container"""
-
+    """ Video container"""
     def __init__(self, video_path, save_path):
         """
         :param video_path: path to a video file

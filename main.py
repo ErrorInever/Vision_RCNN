@@ -3,7 +3,6 @@ import torch
 import torchvision
 import os
 from detection.detector import Detector
-# TODO: add logging and unittest
 
 
 def parse_args():
@@ -12,14 +11,9 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--video', dest='video', help='path to directory where video stored',
                         default=None, type=str)
-
     parser.add_argument('--outdir', dest='outdir',
                         help='directory to save results, default save to /output',
                         default='output', type=str)
-
-    #parser.add_argument('--bbox', dest='bbox', help='draw bounding box around objects', action='store_true')
-    #parser.add_argument('--segment', dest='segment', help='draw border around objects', action='store_true')
-
     parser.add_argument('--use_gpu', dest='use_gpu',
                         help='whether use GPU, if the GPU is unavailable then the CPU will be used',
                         action='store_true')
