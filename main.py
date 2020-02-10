@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     if args.images:
         detector.detect_on_images(args.images, args.outdir)
-    elif args.videos:
+    elif args.video:
         detector.detect_on_video(args.video, args.outdir)
     else:
         raise RuntimeError('Something went wrong...')
