@@ -9,7 +9,6 @@ __C.NUM_WORKERS = 4
 __C.NUM_CLASSES = 81
 __C.THRESHOLD = 0.7
 
-
 # interface
 __C.INTERFACE = edict()
 

@@ -9,8 +9,6 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from cls import Detect
 
-CLASSES = utils.get_classes()
-
 # TODO: refactoring, color classes, dynamic text size
 
 
@@ -53,17 +51,14 @@ def draw_bbox(img, prediction):
     boxes = prediction['boxes'].cpu()
     scores = prediction['scores'].cpu().detach().numpy()
     labels = prediction['labels'].cpu().detach().numpy()
+    cls_names = utils.class_names()
 
     for i, bbox in enumerate(boxes):
         score = round(scores[i]*100, 1)
         label = labels[i]
-
         p1, p2 = tuple(bbox[:2]), tuple(bbox[2:])
         cv2.rectangle(img, p1, p2, color=(255, 0, 0), thickness=2)
-        if label in CLASSES:
-            text = '{cls}{prob}%'.format(cls=CLASSES[label], prob=score)
-        else:
-            text = '{cls}'.format(cls='unknown')
+        text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
 
         p3 = (p1[0], p1[1] - text_size[1] - 4)
@@ -72,11 +67,11 @@ def draw_bbox(img, prediction):
         cv2.rectangle(img, p3, p4, color=(255, 0, 0), thickness=-1)
         cv2.putText(img, text, org=p1, fontFace=cv2.FONT_HERSHEY_PLAIN,
                     fontScale=1, color=(255, 255, 255), thickness=1)
-
     return img
 
 
 def get_all_time(func):
+    """get function execution time"""
     def wrapped(*args, **kwargs):
         start_time = datetime.now()
         res = func(*args, **kwargs)

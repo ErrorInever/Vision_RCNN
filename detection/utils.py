@@ -19,6 +19,6 @@ def collate_fn(batch):
     return tuple(batch)
 
 
-def get_classes():
+def class_names():
     """:return class names"""
     return CLASS_NAMES
