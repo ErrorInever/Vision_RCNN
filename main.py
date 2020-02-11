@@ -41,7 +41,6 @@ if __name__ == '__main__':
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, progress=True)
     model.to(device)
     model.eval()
-
     detector = Detector(model, device)
 
     if args.images:
