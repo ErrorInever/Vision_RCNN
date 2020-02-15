@@ -38,35 +38,36 @@ def filter_threshold(detects, threshold):
     return samples
 
 
-def draw_bbox(img, prediction):
+def draw_bbox(img, prediction, cls_names, colors):
     """ draws bounding boxes, scores and classes on image
     :param img: tensor
     :param prediction: dictionary
     {boxes: [[x1, y1, x2, y2], ...],
      scores: [float],
      labels: [int]}
+    :param cls_names: dictionary class names
+    :param colors: numpy array of colors
     """
     img = img.permute(1, 2, 0).cpu().numpy().copy()
     img = img * 255
     boxes = prediction['boxes'].cpu()
     scores = prediction['scores'].cpu().detach().numpy()
     labels = prediction['labels'].cpu().detach().numpy()
-    cls_names = utils.class_names()
 
     for i, bbox in enumerate(boxes):
         score = round(scores[i]*100, 1)
         label = labels[i]
         p1, p2 = tuple(bbox[:2]), tuple(bbox[2:])
-        cv2.rectangle(img, p1, p2, color=(255, 0, 0), thickness=2)
+        cv2.rectangle(img, p1, p2, color=colors[label], thickness=3)
         text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
 
         p3 = (p1[0], p1[1] - text_size[1] - 4)
         p4 = (p1[0] + text_size[0] + 4, p1[1])
 
-        cv2.rectangle(img, p3, p4, color=(255, 0, 0), thickness=-1)
+        cv2.rectangle(img, p3, p4, color=colors[label], thickness=-1)
         cv2.putText(img, text, org=p1, fontFace=cv2.FONT_HERSHEY_PLAIN,
-                    fontScale=1, color=(255, 255, 255), thickness=1)
+                    fontScale=1, color=(0, 0, 0), thickness=1)
     return img
 
 
@@ -87,6 +88,8 @@ class Detector(Detect):
         :param model: instance of net
         :param device: can be cpu or cuda device
         """
+        self.cls_names = utils.class_names()
+        self.colors = utils.color_bounding_box(self.cls_names)
         super().__init__(model, device)
 
     @get_all_time
@@ -110,7 +113,7 @@ class Detector(Detect):
 
             img_rect = []
             for i, predict in enumerate(predictions):
-                img_rect.append(draw_bbox(images[i], predict))
+                img_rect.append(draw_bbox(images[i], predict, self.cls_names, self.colors))
 
             for i, img in enumerate(img_rect):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
@@ -137,7 +140,7 @@ class Detector(Detect):
 
             img_rect = []
             for i, predict in enumerate(predictions):
-                img_rect.append(draw_bbox(frames[i], predict))
+                img_rect.append(draw_bbox(frames[i], predict, self.cls_names, self.colors))
 
             for i, img in enumerate(img_rect):
                 img = np.uint8(img)

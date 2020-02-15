@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from config.classes.coco_labels import CLASS_NAMES
 
 
@@ -22,3 +23,8 @@ def collate_fn(batch):
 def class_names():
     """:return class names"""
     return CLASS_NAMES
+
+
+def color_bounding_box(classes):
+    """ :return array of colors"""
+    return np.random.uniform(0, 255, size=(len(classes), 3))
