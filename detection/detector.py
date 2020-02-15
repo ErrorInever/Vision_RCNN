@@ -62,11 +62,11 @@ def draw_bbox(img, prediction, cls_names, colors):
         text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
 
-        p3 = (p1[0], p1[1] - text_size[1] - 4)
+        p3 = (p1[0] - 2, p1[1] - text_size[1] - 6)
         p4 = (p1[0] + text_size[0] + 4, p1[1])
 
         cv2.rectangle(img, p3, p4, color=colors[label], thickness=-1)
-        cv2.putText(img, text, org=p1, fontFace=cv2.FONT_HERSHEY_PLAIN,
+        cv2.putText(img, text, (p1[0], p1[1] - text_size[1] + 6), fontFace=cv2.FONT_HERSHEY_PLAIN,
                     fontScale=1, color=(0, 0, 0), thickness=1)
     return img
 
