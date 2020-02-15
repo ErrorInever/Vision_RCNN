@@ -2,14 +2,14 @@ import torch
 import os
 import cv2
 import numpy as np
+import interface.bounding_box
 from datetime import datetime
 from detection import utils
-from detection.dataset import Images, Video
+from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from cls import Detect
-
-# TODO: refactoring, color classes, dynamic text size
+from data.cls import Detect
+from interface.bounding_box import draw_bbox
 
 
 def filter_threshold(detects, threshold):
@@ -38,41 +38,8 @@ def filter_threshold(detects, threshold):
     return samples
 
 
-def draw_bbox(img, prediction, cls_names, colors):
-    """ draws bounding boxes, scores and classes on image
-    :param img: tensor
-    :param prediction: dictionary
-    {boxes: [[x1, y1, x2, y2], ...],
-     scores: [float],
-     labels: [int]}
-    :param cls_names: dictionary class names
-    :param colors: numpy array of colors
-    """
-    img = img.permute(1, 2, 0).cpu().numpy().copy()
-    img = img * 255
-    boxes = prediction['boxes'].cpu()
-    scores = prediction['scores'].cpu().detach().numpy()
-    labels = prediction['labels'].cpu().detach().numpy()
-
-    for i, bbox in enumerate(boxes):
-        score = round(scores[i]*100, 1)
-        label = labels[i]
-        p1, p2 = tuple(bbox[:2]), tuple(bbox[2:])
-        cv2.rectangle(img, p1, p2, color=colors[label], thickness=3)
-        text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
-        text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
-
-        p3 = (p1[0] - 2, p1[1] - text_size[1] - 6)
-        p4 = (p1[0] + text_size[0] + 4, p1[1])
-
-        cv2.rectangle(img, p3, p4, color=colors[label], thickness=-1)
-        cv2.putText(img, text, (p1[0], p1[1] - text_size[1] + 6), fontFace=cv2.FONT_HERSHEY_PLAIN,
-                    fontScale=1, color=(0, 0, 0), thickness=1)
-    return img
-
-
-def get_all_time(func):
-    """get function execution time"""
+def execution_time(func):
+    """print wasted time of function"""
     def wrapped(*args, **kwargs):
         start_time = datetime.now()
         res = func(*args, **kwargs)
@@ -89,10 +56,10 @@ class Detector(Detect):
         :param device: can be cpu or cuda device
         """
         self.cls_names = utils.class_names()
-        self.colors = utils.color_bounding_box(self.cls_names)
+        self.colors = interface.bounding_box.color_bounding_box(self.cls_names)
         super().__init__(model, device)
 
-    @get_all_time
+    @execution_time
     def detect_on_images(self, img_path, out_path, threshold=0.7):
         """
         Detects objects on images and saves it
@@ -119,7 +86,7 @@ class Detector(Detect):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-    @get_all_time
+    @execution_time
     def detect_on_video(self, data_path, out_path, threshold=0.7):
         """
         Detects objects on video and saves it

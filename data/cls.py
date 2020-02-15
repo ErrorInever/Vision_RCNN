@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class Detect(ABC):
-    """Base class of detector"""
+    """Base class of detectors"""
     def __init__(self, model, device):
         self.model = model
         self.device = device
