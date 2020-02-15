@@ -3,6 +3,7 @@ import torch
 import torchvision
 import os
 from detection.detector import Detector
+from config.cfg import cfg
 
 
 def parse_args():
@@ -44,8 +45,8 @@ if __name__ == '__main__':
     detector = Detector(model, device)
 
     if args.images:
-        detector.detect_on_images(args.images, args.outdir)
+        detector.detect_on_images(args.images, args.outdir, threshold=cfg.THRESHOLD)
     elif args.video:
-        detector.detect_on_video(args.video, args.outdir)
+        detector.detect_on_video(args.video, args.outdir, threshold=cfg.THRESHOLD)
     else:
         raise RuntimeError('Something went wrong...')

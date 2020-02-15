@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from config.cfg import cfg
 
 
 def draw_bbox(img, prediction, cls_names, colors):
@@ -22,7 +23,7 @@ def draw_bbox(img, prediction, cls_names, colors):
         score = round(scores[i]*100, 1)
         label = labels[i]
         p1, p2 = tuple(bbox[:2]), tuple(bbox[2:])
-        cv2.rectangle(img, p1, p2, color=colors[label], thickness=3)
+        cv2.rectangle(img, p1, p2, color=colors[label], thickness=cfg.THICKNESS_BBOX)
         text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
 
@@ -40,3 +41,29 @@ def color_bounding_box(classes):
     Each execution makes different colors
     :return numpy array"""
     return np.random.uniform(0, 255, size=(len(classes), 3))
+
+
+def filter_threshold(detects, threshold):
+    """
+    Removes predictions which scores < treshhold
+    :param detects: list of dictionary
+    [{boxes: [[x1, y1, x2, y2], ...],
+     scores: [float],
+     labels: [int],
+     , ...]
+    :param threshold: float
+    :return: list of dictionary
+    """
+    samples = []
+
+    for detect in detects:
+        scores = detect['scores']
+        mask = len(list(filter(lambda x: x >= threshold, scores)))
+
+        sample = {'boxes': detect['boxes'][:mask],
+                  'labels': detect['labels'][:mask],
+                  'scores': detect['scores'][:mask]
+                  }
+        samples.append(sample)
+
+    return samples

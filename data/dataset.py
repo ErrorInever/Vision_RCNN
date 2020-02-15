@@ -4,7 +4,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset
 from PIL import Image
 from datetime import datetime
-from detection import utils
+import utils
 
 
 class Images(Dataset):

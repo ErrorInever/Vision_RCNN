@@ -1,41 +1,16 @@
 import torch
 import os
 import cv2
+import utils
 import numpy as np
-import interface.bounding_box
+import detection.functions
 from datetime import datetime
-from detection import utils
 from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.cls import Detect
-from interface.bounding_box import draw_bbox
-
-
-def filter_threshold(detects, threshold):
-    """
-    Removes predictions which scores < treshhold
-    :param detects: list of dictionary
-    [{boxes: [[x1, y1, x2, y2], ...],
-     scores: [float],
-     labels: [int],
-     , ...]
-    :param threshold: float
-    :return: list of dictionary
-    """
-    samples = []
-
-    for detect in detects:
-        scores = detect['scores']
-        mask = len(list(filter(lambda x: x >= threshold, scores)))
-
-        sample = {'boxes': detect['boxes'][:mask],
-                  'labels': detect['labels'][:mask],
-                  'scores': detect['scores'][:mask]
-                  }
-        samples.append(sample)
-
-    return samples
+from detection.functions import draw_bbox, filter_threshold
+from config.cfg import cfg
 
 
 def execution_time(func):
@@ -56,7 +31,7 @@ class Detector(Detect):
         :param device: can be cpu or cuda device
         """
         self.cls_names = utils.class_names()
-        self.colors = interface.bounding_box.color_bounding_box(self.cls_names)
+        self.colors = detection.functions.color_bounding_box(self.cls_names)
         super().__init__(model, device)
 
     @execution_time
@@ -68,7 +43,8 @@ class Detector(Detect):
         :param threshold: threshold detection
         """
         img_dataset = Images(img_path)
-        dataloader = DataLoader(img_dataset, batch_size=10, num_workers=4, shuffle=False, collate_fn=utils.collate_fn)
+        dataloader = DataLoader(img_dataset, batch_size=cfg.BATCH_SIZE, num_workers=cfg.NUM_WORKERS, shuffle=False,
+                                collate_fn=utils.collate_fn)
 
         for images in tqdm(dataloader):
             images = list(image.to(self.device) for image in images)
@@ -95,7 +71,6 @@ class Detector(Detect):
         :param threshold: threshold detection
         """
         video = Video(data_path, out_path)
-        print(video)
 
         for frames in tqdm(video.get_frame(), total=len(video)):
             frames = [frame.to(self.device) for frame in frames]
@@ -112,5 +87,6 @@ class Detector(Detect):
             for i, img in enumerate(img_rect):
                 img = np.uint8(img)
                 video.out.write(img)
+
         video.out.release()
         print('Done. Detect video saves to {}'.format(video.save_path))

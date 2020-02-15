@@ -23,4 +23,3 @@ def class_names():
     :return dictionary {id : name}"""
     return CLASS_NAMES
 
-
