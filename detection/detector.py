@@ -31,7 +31,7 @@ class Detector(Detect):
         :param device: can be cpu or cuda device
         """
         self.cls_names = utils.class_names()
-        self.colors = detection.functions.color_bounding_box(self.cls_names)
+        self.colors = detection.functions.color_seed_bounding_box(self.cls_names)
         super().__init__(model, device)
 
     @execution_time

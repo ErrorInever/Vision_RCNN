@@ -43,6 +43,26 @@ def color_bounding_box(classes):
     return np.random.uniform(80, 255, size=(len(classes), 3))
 
 
+def color_seed_bounding_box(classes):
+    colors = np.random.uniform(80, 255, size=(len(classes), 3))
+    # bio
+    colors[1] = [204, 6, 5]       # person
+    colors[16] = [118, 255, 122]  # bird
+    colors[17] = [229, 81, 55]    # cat
+    colors[18] = [219, 215, 210]  # dog
+    # vehicle
+    colors[2] = [0, 149, 182]     # bicycle
+    colors[3] = [145, 30, 66]     # car
+    colors[4] = [205, 164, 222]   # motorcycle
+    colors[5] = [249, 132, 229]   # airplane
+    colors[6] = [248, 243, 43]    # bus
+    colors[7] = [100, 149, 237]   # train
+    colors[8] = [222, 76, 138]    # truck
+    # another
+    colors[10] = [237, 118, 14]   # traffic light
+    return colors
+
+
 def filter_threshold(detects, threshold):
     """
     Removes predictions which scores < treshhold
