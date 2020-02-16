@@ -15,6 +15,8 @@ def parse_args():
     parser.add_argument('--outdir', dest='outdir',
                         help='directory to save results, default save to /output',
                         default='output', type=str)
+    parser.add_argument('--flip', dest='flip', help='flip video. Warning: expensive operation',
+                        action='store_true')
     parser.add_argument('--use_gpu', dest='use_gpu',
                         help='whether use GPU, if the GPU is unavailable then the CPU will be used',
                         action='store_true')
@@ -47,6 +49,6 @@ if __name__ == '__main__':
     if args.images:
         detector.detect_on_images(args.images, args.outdir, threshold=cfg.THRESHOLD)
     elif args.video:
-        detector.detect_on_video(args.video, args.outdir, threshold=cfg.THRESHOLD)
+        detector.detect_on_video(args.video, args.outdir, threshold=cfg.THRESHOLD, flip=args.flip)
     else:
         raise RuntimeError('Something went wrong...')

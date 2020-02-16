@@ -4,13 +4,18 @@ from config.classes.coco_labels import CLASS_NAMES
 
 def frame_to_tensor(frame):
     """
-    Convert image frame to tensor
+    Convert frame to tensor
     :param frame: img
     :return: 3R tensor
     """
     frame = torch.from_numpy(frame).float() / 255.0
     frame = frame.permute(2, 0, 1)
     return frame
+
+
+def flip_vert_tensor(tensor):
+    """vertical flip"""
+    return tensor.flip(2, 1)
 
 
 def collate_fn(batch):

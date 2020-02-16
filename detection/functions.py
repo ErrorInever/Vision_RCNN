@@ -40,7 +40,7 @@ def color_bounding_box(classes):
     """
     Each execution makes different colors
     :return numpy array"""
-    return np.random.uniform(0, 255, size=(len(classes), 3))
+    return np.random.uniform(80, 255, size=(len(classes), 3))
 
 
 def filter_threshold(detects, threshold):
