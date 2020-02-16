@@ -1,7 +1,7 @@
 import argparse
 import torch
-import torchvision
 import os
+import models
 from detection.detector import Detector
 from config.cfg import cfg
 
@@ -41,7 +41,8 @@ if __name__ == '__main__':
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device:{}'.format(device))
 
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, progress=True)
+    model = models.get_model_faster_rcnn()
+
     model.to(device)
     model.eval()
     detector = Detector(model, device)
