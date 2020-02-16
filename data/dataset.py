@@ -42,7 +42,8 @@ class Video:
         """
         self.cap = cv2.VideoCapture(video_path)
         self.video_path = video_path
-        self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(datetime.today().strftime('%Y-%m-%d')))
+        self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(
+            datetime.today().strftime('%Y-%m-%d_%H:%M:%S')))
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
         self.width, self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)), \
                                   int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
