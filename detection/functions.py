@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 from config.cfg import cfg
 
 
@@ -34,33 +33,6 @@ def draw_bbox(img, prediction, cls_names, colors):
         cv2.putText(img, text, (p1[0], p1[1] - text_size[1] + 6), fontFace=cv2.FONT_HERSHEY_PLAIN,
                     fontScale=cfg.TEXT_SIZE, color=(0, 0, 0), thickness=1)
     return img
-
-
-def color_bounding_box(classes):
-    """
-    Each execution makes different colors
-    :return numpy array"""
-    return np.random.uniform(80, 255, size=(len(classes), 3))
-
-
-def color_seed_bounding_box(classes):
-    colors = np.random.uniform(80, 255, size=(len(classes), 3))
-    # bio
-    colors[1] = [204, 6, 5]       # person
-    colors[16] = [118, 255, 122]  # bird
-    colors[17] = [229, 81, 55]    # cat
-    colors[18] = [219, 215, 210]  # dog
-    # vehicle
-    colors[2] = [0, 149, 182]     # bicycle
-    colors[3] = [127, 255, 212]   # car 
-    colors[4] = [205, 164, 222]   # motorcycle
-    colors[5] = [249, 132, 229]   # airplane
-    colors[6] = [248, 243, 43]    # bus
-    colors[7] = [100, 149, 237]   # train
-    colors[8] = [222, 76, 138]    # truck
-    # another
-    colors[10] = [237, 118, 14]   # traffic light
-    return colors
 
 
 def filter_threshold(detects, threshold):

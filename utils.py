@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from config.classes.coco_labels import CLASS_NAMES
 
@@ -28,3 +29,29 @@ def class_names():
     :return dictionary {id : name}"""
     return CLASS_NAMES
 
+
+def seed_colors(classes):
+    colors = np.random.uniform(80, 255, size=(len(classes), 3))
+    # bio
+    colors[1] = [204, 6, 5]       # person
+    colors[16] = [118, 255, 122]  # bird
+    colors[17] = [229, 81, 55]    # cat
+    colors[18] = [219, 215, 210]  # dog
+    # vehicle
+    colors[2] = [0, 149, 182]     # bicycle
+    colors[3] = [127, 255, 212]   # car
+    colors[4] = [205, 164, 222]   # motorcycle
+    colors[5] = [249, 132, 229]   # airplane
+    colors[6] = [248, 243, 43]    # bus
+    colors[7] = [100, 149, 237]   # train
+    colors[8] = [222, 76, 138]    # truck
+    # another
+    colors[10] = [237, 118, 14]   # traffic light
+    return colors
+
+
+def random_colors(classes):
+    """
+    Each execution makes different colors
+    :return numpy array"""
+    return np.random.uniform(80, 255, size=(len(classes), 3))
