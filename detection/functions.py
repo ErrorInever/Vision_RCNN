@@ -52,7 +52,7 @@ def color_seed_bounding_box(classes):
     colors[18] = [219, 215, 210]  # dog
     # vehicle
     colors[2] = [0, 149, 182]     # bicycle
-    colors[3] = [145, 30, 66]     # car
+    colors[3] = [127, 255, 212]   # car 
     colors[4] = [205, 164, 222]   # motorcycle
     colors[5] = [249, 132, 229]   # airplane
     colors[6] = [248, 243, 43]    # bus
