@@ -1,57 +1,97 @@
-import numpy as np
 import torch
 from config.classes.coco_labels import CLASS_NAMES
 
 
-def frame_to_tensor(frame):
+def img_to_tensor(image):
     """
-    Convert frame to tensor
-    :param frame: img
+    Converts image to tensor and normalize
+    :param image: image numpy array format
     :return: 3R tensor
     """
-    frame = torch.from_numpy(frame).float() / 255.0
-    frame = frame.permute(2, 0, 1)
-    return frame
+    image = torch.from_numpy(image).float() / 255.0
+    image = image.permute(2, 0, 1)
+    return image
+
+
+def reverse_normalization(tensor):
+    """
+    Converts image tensor to numpy array
+    :param tensor: image 3R tensor format
+    :return: image numpy array format
+    """
+    return tensor.permute(1, 2, 0).mul(255).numpy().copy()
 
 
 def flip_vert_tensor(tensor):
-    """vertical flip"""
+    """vertical flip 3R tensor. EXPENSIVE OPERATION"""
     return tensor.flip(2, 1)
 
 
 def collate_fn(batch):
+    """ pack batch"""
     return tuple(batch)
 
 
 def class_names():
     """
     Get coco class names
-    :return dictionary {id : name}"""
+    :return dictionary {id : name}
+    """
     return CLASS_NAMES
 
 
-def seed_colors(classes):
-    colors = np.random.uniform(80, 255, size=(len(classes), 3))
-    # bio
-    colors[1] = [204, 6, 5]       # person
-    colors[16] = [118, 255, 122]  # bird
-    colors[17] = [229, 81, 55]    # cat
-    colors[18] = [219, 215, 210]  # dog
-    # vehicle
-    colors[2] = [0, 149, 182]     # bicycle
-    colors[3] = [127, 255, 212]   # car
-    colors[4] = [205, 164, 222]   # motorcycle
-    colors[5] = [249, 132, 229]   # airplane
-    colors[6] = [248, 243, 43]    # bus
-    colors[7] = [100, 149, 237]   # train
-    colors[8] = [222, 76, 138]    # truck
-    # another
-    colors[10] = [237, 118, 14]   # traffic light
-    return colors
-
-
-def random_colors(classes):
+def filter_prediction(predictions, treshhold):
     """
-    Each execution makes different colors
-    :return numpy array"""
-    return np.random.uniform(80, 255, size=(len(classes), 3))
+    Remove prediction where scores < threshold
+    :param predictions:
+    ``List[Dict[Tensor]]`` The fields of the ``Dict`` are as follows:
+        - boxes (``FloatTensor[N, 4]``)
+        - labels (``Int64Tensor[N]``)
+        - scores (``Tensor[N]``)
+        * optional
+        - masks (``UInt8Tensor[N, 1, H, W]``)
+    :param treshhold: threshold
+    :return: the same predictions without scores < threshold
+    """
+    samples = []
+    for i, prediction in enumerate(predictions):
+        tresh = len([x for x in predictions[i]['scores'] if x >= treshhold])
+        sample = {
+            'boxes': prediction['boxes'][:tresh],
+            'labels': prediction['labels'][:tresh],
+            'scores': prediction['scores'][:tresh],
+        }
+
+        if 'masks' in prediction:
+            sample = {
+                'masks': prediction['masks'][:tresh]
+            }
+        samples.append(sample)
+
+    return samples
+
+
+# def filter_threshold(detects, threshold):
+#     """
+#     Removes predictions which scores < treshhold
+#     :param detects: list of dictionary
+#     [{boxes: [[x1, y1, x2, y2], ...],
+#      scores: [float],
+#      labels: [int],
+#      , ...]
+#     :param threshold: float
+#     :return: list of dictionary
+#     """
+#     samples = []
+#
+#     for detect in detects:
+#         scores = detect['scores']
+#         mask = len(list(filter(lambda x: x >= threshold, scores)))
+#
+#         sample = {'boxes': detect['boxes'][:mask],
+#                   'labels': detect['labels'][:mask],
+#                   'scores': detect['scores'][:mask]
+#                   }
+#         samples.append(sample)
+#
+#     return samples

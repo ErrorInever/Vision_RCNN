@@ -71,7 +71,7 @@ class Video:
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
-                frame = utils.frame_to_tensor(frame)
+                frame = utils.img_to_tensor(frame)
                 if self.flip:
                     frame = utils.flip_vert_tensor(frame)
                 yield [frame]
