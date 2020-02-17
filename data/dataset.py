@@ -4,11 +4,12 @@ from torchvision import transforms
 from torch.utils.data import Dataset
 from PIL import Image
 from datetime import datetime
-from detection import utils
+import utils
 
 
 class Images(Dataset):
     """Container for images"""
+
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
         self.img_path = img_path
@@ -32,20 +33,24 @@ class Images(Dataset):
 
 class Video:
     """ Video container"""
-    def __init__(self, video_path, save_path):
+
+    def __init__(self, video_path, save_path, flip):
         """
         :param video_path: path to a video file
         :param save_path: path to output directory
+        :param flip: if true - flip video. NOTE: expensive operation.
         """
         self.cap = cv2.VideoCapture(video_path)
         self.video_path = video_path
-        self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(datetime.today().strftime('%Y-%m-%d')))
+        self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(
+            datetime.today().strftime('%Y-%m-%d_%H:%M:%S')))
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
         self.width, self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)), \
                                   int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.duration = self.__len__() / self.fps
         self.out = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.width, self.height))
+        self.flip = flip
 
     def __str__(self):
         info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
@@ -66,7 +71,9 @@ class Video:
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
-                frame = utils.frame_to_tensor(frame)
+                frame = utils.img_to_tensor(frame)
+                if self.flip:
+                    frame = utils.flip_vert_tensor(frame)
                 yield [frame]
             else:
                 break
