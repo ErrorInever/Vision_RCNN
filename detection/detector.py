@@ -60,33 +60,34 @@ class Detector(Detect):
                 # cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
                 img.save(save_path, format="PNG")
 
-    # @execution_time
-    # def detect_on_video(self, data_path, out_path, threshold=0.7, flip=False):
-    #     """
-    #     Detects objects on video and saves it
-    #     :param flip: if true - flip video
-    #     :param data_path: path to video
-    #     :param out_path: path to output result
-    #     :param threshold: threshold detection
-    #     """
-    #     video = Video(data_path, out_path, flip)
-    #
-    #     for frames in tqdm(video.get_frame(), total=len(video)):
-    #         frames = [frame.to(self.device) for frame in frames]
-    #
-    #         with torch.no_grad():
-    #             predictions = self.model(frames)
-    #
-    #         predictions = filter_threshold(predictions, threshold)
-    #
-    #         img_rect = []
-    #         for i, predict in enumerate(predictions):
-    #             img_rect.append(draw_bbox(frames[i], predict, self.cls_names, self.colors))
-    #             img_rect.append(dis)
-    #
-    #         for i, img in enumerate(img_rect):
-    #             img = np.uint8(img)
-    #             video.out.write(img)
-    #
-    #     video.out.release()
-    #     print('Done. Detect video saves to {}'.format(video.save_path))
+    @execution_time
+    def detect_on_video(self, data_path, out_path, threshold=0.7, flip=False):
+        """
+        Detects objects on video and saves it
+        :param flip: if true - flip video
+        :param data_path: path to video
+        :param out_path: path to output result
+        :param threshold: threshold detection
+        """
+        # video = Video(data_path, out_path, flip)
+        #
+        # for frames in tqdm(video.get_frame(), total=len(video)):
+        #     frames = [frame.to(self.device) for frame in frames]
+        #
+        #     with torch.no_grad():
+        #         predictions = self.model(frames)
+        #
+        #     predictions = filter_threshold(predictions, threshold)
+        #
+        #     img_rect = []
+        #     for i, predict in enumerate(predictions):
+        #         img_rect.append(draw_bbox(frames[i], predict, self.cls_names, self.colors))
+        #         img_rect.append(dis)
+        #
+        #     for i, img in enumerate(img_rect):
+        #         img = np.uint8(img)
+        #         video.out.write(img)
+        #
+        # video.out.release()
+        # print('Done. Detect video saves to {}'.format(video.save_path))
+        pass
