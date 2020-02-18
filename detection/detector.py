@@ -104,6 +104,3 @@ class Detector(Detect):
         #
         # video.out.release()
         # print('Done. Detect video saves to {}'.format(video.save_path))
-
-detector = Detector(1, 1)
-detector.detect_on_video(r'C:\Users\Admin\Desktop\test_videos\test_cat.mp4', r'C:\Users\Admin\Desktop')
