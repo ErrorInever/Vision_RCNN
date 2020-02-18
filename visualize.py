@@ -86,7 +86,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
             if display_caption:
                 class_name = cls_names[cls_id]
                 score = scores[i]
-                caption = '{} {:.3f}'.format(class_name, score)
+                caption = '{} {}%'.format(class_name, round(score * 100, 1))
                 try:
                     font = ImageFont.truetype(cfg.PATH_TO_FONT, cfg.FONT_SIZE)
                 except IOError:
