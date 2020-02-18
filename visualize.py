@@ -11,7 +11,7 @@ def random_colors(n_classes):
     Each execution makes different colors
     :param n_classes: num classes
     :return numpy array"""
-    colors = np.random.uniform(80, 255, size=(len(n_classes), 3))
+    colors = np.random.randint(80, 255, size=(len(n_classes), 3))
     colors = tuple(map(tuple, colors))
     return colors
 
@@ -22,7 +22,7 @@ def seed_colors(n_classes):
     :param n_classes: num classes
     :return: numpy array
     """
-    colors = np.random.uniform(80, 255, size=(len(n_classes), 3))
+    colors = np.random.randint(80, 255, size=(len(n_classes), 3))
     # bio
     colors[1] = [204, 6, 5]       # person
     colors[16] = [118, 255, 122]  # bird
