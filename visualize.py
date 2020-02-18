@@ -4,29 +4,30 @@ from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 
 
-def random_colors(n_classes):
+def random_colors(classes):
     """
-    Each execution makes different colors
-    :param n_classes: num classes
-    :return numpy array"""
-    colors = np.random.randint(80, 255, size=(len(n_classes), 3))
+    Each execution makes random colors
+    :param classes: ``Dict[class_id, "name of class"]``, dictionary of class names
+    :return ``Tuple(Tuple(R,G,B))``, list of colors format RGB
+    """
+    colors = np.random.randint(80, 255, size=(len(classes), 3))
     colors = tuple(map(tuple, colors))
     return colors
 
 
-def seed_colors(n_classes):
+def assign_colors(classes):
     """
-    Define colors for classes
-    :param n_classes: num classes
-    :return: numpy array
+    Assigns colors to specific classes
+    :param classes: ``Dict[class_id, "name of class"]``, dictionary of class names
+    :return: ``Tuple(Tuple(R,G,B))``, list of colors format RGB
     """
-    colors = np.random.randint(80, 255, size=(len(n_classes), 3))
+    colors = np.random.randint(80, 255, size=(len(classes), 3))
     # bio
     colors[1] = [204, 6, 5]       # person
     colors[16] = [118, 255, 122]  # bird
     colors[17] = [229, 81, 55]    # cat
     colors[18] = [219, 215, 210]  # dog
-    # vehicle
+    # vehicles
     colors[2] = [0, 149, 182]     # bicycle
     colors[3] = [127, 255, 212]   # car
     colors[4] = [205, 164, 222]   # motorcycle
@@ -34,7 +35,7 @@ def seed_colors(n_classes):
     colors[6] = [248, 243, 43]    # bus
     colors[7] = [100, 149, 237]   # train
     colors[8] = [222, 76, 138]    # truck
-    # another
+    # other
     colors[10] = [237, 118, 14]   # traffic light
 
     colors = tuple(map(tuple, colors))

@@ -13,7 +13,7 @@ class Segmentator(Detect):
     """object segmentation"""
     def __init__(self, model, device):
         self.cls_names = utils.class_names()
-        self.colors = visualize.seed_colors(self.cls_names)
+        self.colors = visualize.assign_colors(self.cls_names)
         super().__init__(model, device)
 
     def detect_on_images(self, data_path, out_path, treshhold):

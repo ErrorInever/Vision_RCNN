@@ -31,7 +31,7 @@ class Detector(Detect):
         :param device: can be cpu or cuda device
         """
         self.cls_names = utils.class_names()
-        self.colors = visualize.seed_colors(self.cls_names)
+        self.colors = visualize.assign_colors(self.cls_names)
         super().__init__(model, device)
 
     @execution_time
