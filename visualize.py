@@ -66,7 +66,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     :param treshhold: remove predictions < threshold
     """
     predictions = utils.filter_prediction(predictions, treshhold)
-    # FIXME: wrong images count?
     image_list = []
     for k, prediction in enumerate(predictions):
         boxes = prediction['boxes'].cpu()
@@ -88,7 +87,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 class_name = cls_names[cls_id]
                 score = scores[i]
                 caption = '{} {:.3f}'.format(class_name, score)
-                font = ImageFont.truetype('FasterRcnnImplementation/config/fonts/Ubuntu-B.ttf', cfg.FONT_SIZE)
+                font = ImageFont.truetype(cfg.PATH_TO_FONT, cfg.FONT_SIZE)
                 text_size = draw.textsize(caption, font)
                 draw.rectangle(xy=((x1, y1 - text_size[1] - 6), (x1 + text_size[0] + 4, y1)),
                                fill=colors[cls_id])
