@@ -86,23 +86,3 @@ class Detector(Detect):
                 video.out.write(img)
         video.out.release()
         print('Done. Detect on video saves to {}'.format(video.save_path))
-
-        #for frame in tqdm(video.get_frame(), total=len(video)):
-        #    frame = [frame.to(self.device) for frame in frames]
-        #
-        #     with torch.no_grad():
-        #         predictions = self.model(frames)
-        #
-        #     predictions = filter_threshold(predictions, threshold)
-        #
-        #     img_rect = []
-        #     for i, predict in enumerate(predictions):
-        #         img_rect.append(draw_bbox(frames[i], predict, self.cls_names, self.colors))
-        #         img_rect.append(dis)
-        #
-        #     for i, img in enumerate(img_rect):
-        #         img = np.uint8(img)
-        #         video.out.write(img)
-        #
-        # video.out.release()
-        # print('Done. Detect video saves to {}'.format(video.save_path))
