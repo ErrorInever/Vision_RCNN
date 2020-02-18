@@ -11,7 +11,9 @@ def random_colors(n_classes):
     Each execution makes different colors
     :param n_classes: num classes
     :return numpy array"""
-    return np.random.uniform(80, 255, size=(len(n_classes), 3))
+    colors = np.random.uniform(80, 255, size=(len(n_classes), 3))
+    colors = tuple(map(tuple, colors))
+    return colors
 
 
 def seed_colors(n_classes):
@@ -36,6 +38,8 @@ def seed_colors(n_classes):
     colors[8] = [222, 76, 138]    # truck
     # another
     colors[10] = [237, 118, 14]   # traffic light
+
+    colors = tuple(map(tuple, colors))
     return colors
 
 
@@ -78,7 +82,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
             x1, y1, x2, y2 = boxes[i]
 
             if display_boxes:
-                draw.rectangle(xy=((x1, y1), (x2, y2)), outline=colors[cls_id].tolist(), width=cfg.THICKNESS_BBOX)
+                draw.rectangle(xy=((x1, y1), (x2, y2)), outline=colors[cls_id], width=cfg.THICKNESS_BBOX)
 
             if display_caption:
                 class_name = cls_names[cls_id]
@@ -87,7 +91,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 font = ImageFont.truetype('../config/fonts/Ubuntu-B.ttf', cfg.FONT_SIZE)
                 text_size = draw.textsize(caption, font)
                 draw.rectangle(xy=((x1, y1 - text_size[1] - 6), (x1 + text_size[0] + 4, y1)),
-                               fill=colors[cls_id].tolist())
+                               fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
             if display_masks and masks is not None:
