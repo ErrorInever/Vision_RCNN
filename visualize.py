@@ -23,20 +23,20 @@ def assign_colors(classes):
     """
     colors = np.random.randint(80, 255, size=(len(classes), 3))
     # bio
-    colors[1] = [204, 6, 5]       # person
+    colors[1] = [204, 6, 5]  # person
     colors[16] = [118, 255, 122]  # bird
-    colors[17] = [229, 81, 55]    # cat
+    colors[17] = [229, 81, 55]  # cat
     colors[18] = [219, 215, 210]  # dog
     # vehicles
-    colors[2] = [0, 149, 182]     # bicycle
-    colors[3] = [127, 255, 212]   # car
-    colors[4] = [205, 164, 222]   # motorcycle
-    colors[5] = [249, 132, 229]   # airplane
-    colors[6] = [248, 243, 43]    # bus
-    colors[7] = [100, 149, 237]   # train
-    colors[8] = [222, 76, 138]    # truck
+    colors[2] = [0, 149, 182]  # bicycle
+    colors[3] = [127, 255, 212]  # car
+    colors[4] = [205, 164, 222]  # motorcycle
+    colors[5] = [249, 132, 229]  # airplane
+    colors[6] = [248, 243, 43]  # bus
+    colors[7] = [100, 149, 237]  # train
+    colors[8] = [222, 76, 138]  # truck
     # other
-    colors[10] = [237, 118, 14]   # traffic light
+    colors[10] = [237, 118, 14]  # traffic light
 
     colors = tuple(map(tuple, colors))
     return colors
@@ -93,7 +93,8 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                     font = ImageFont.load_default()
 
                 text_size = draw.textsize(caption, font)
-                draw.rectangle(xy=((x1, y1 - text_size[1] - 6), (x1 + text_size[0] + 4, y1)),
+                draw.rectangle(xy=((x1, y1 - text_size[1] - cfg.HEIGHT_TEXT_BBOX),
+                                   (x1 + text_size[0] + cfg.WIDTH_TEXT_BBOX, y1)),
                                fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
@@ -103,7 +104,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
         image_list.append(image)
 
     return image_list
-
 
 # def draw_bbox(img, prediction, cls_names, colors):
 #     """ Draws bounding boxes, scores and classes on image
