@@ -1,6 +1,7 @@
 import torch
 import os
 import utils
+import math
 import numpy as np
 from datetime import datetime
 import visualize
@@ -69,10 +70,10 @@ class Detector(Detect):
         :param threshold: threshold detection
         """
         video = Video(data_path, out_path, flip)
-        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, num_workers=cfg.NUM_WORKERS,
-                                collate_fn=utils.collate_fn)
-        # FIXME: tqdm doesn't work
-        for batch in tqdm(dataloader):
+        # FIXME: num_workers makes infinity loop
+        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, collate_fn=utils.collate_fn)
+
+        for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
             images = [frame.to(self.device) for frame in batch]
             with torch.no_grad():
                 predictions = self.model(images)

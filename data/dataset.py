@@ -35,7 +35,6 @@ class Images(Dataset):
 
 class Video(IterableDataset):
     """ Iterable video dataset"""
-
     def __init__(self, video_path, save_path, flip):
         """
         :param video_path: path to a video file
@@ -47,8 +46,8 @@ class Video(IterableDataset):
         self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(
             datetime.today().strftime('%Y-%m-%d_%H:%M:%S')))
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.width, self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)), \
-                                  int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.duration = self.__len__() / self.fps
         self.out = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.width, self.height))
@@ -69,11 +68,9 @@ class Video(IterableDataset):
                 break
         self.cap.release()
 
-    # def get_stream(self):
-    #     return itertools.cycle(self.get_frame())
-
+    @property
     def __iter__(self):
-        return self.get_frame()
+        return self.get_frame
 
     def __str__(self):
         info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
