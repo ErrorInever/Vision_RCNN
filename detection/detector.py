@@ -57,7 +57,6 @@ class Detector(Detect):
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
-                # cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
                 img.save(save_path, format="PNG")
 
     @execution_time

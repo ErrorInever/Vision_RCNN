@@ -1,9 +1,7 @@
 import utils
-import torch
 import numpy as np
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
-from tqdm import tqdm
 
 
 def random_colors(n_classes):
@@ -46,7 +44,7 @@ def seed_colors(n_classes):
 def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                     display_masks=True, display_caption=True, treshhold=0.7):
     """
-    :param images: ''List[[Tensor]]'', list of images
+    :param images: ``List[[Tensor]]``, list of images
     :param predictions:
     ``List[Dict[Tensor]]``, one for each input image. The fields of the ``Dict`` are as
     follows:
@@ -58,12 +56,13 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
         - masks (``UInt8Tensor[N, 1, H, W]``): the predicted masks for each instance, in ``0-1`` range. In order to
           obtain the final segmentation masks, the soft masks can be thresholded, generally
           with a value of 0.5 (``mask >= 0.5``)
-    :param cls_names: dictionary of class names {number of id : "name of class"}
-    :param colors: numpy array ((R, G, B), ... )
-    :param display_boxes: if True: displaying bounding boxes on image
-    :param display_masks: if True: displaying masks on image
-    :param display_caption: if True: displaying caption
-    :param treshhold: remove predictions < threshold
+    :param cls_names: ``Dict[class_id, "name of class"]``, dictionary of class names
+    :param colors: ``Tuple(Tuple(R,G,B))``, list of colors format RGB
+    :param display_boxes: if True: displays bounding boxes on images
+    :param display_masks: if True: displays masks on images
+    :param display_caption: if True: displays caption on images
+    :param treshhold: removes predictions < threshold
+    :return ``List[[numpy_array]]``, list of images
     """
     predictions = utils.filter_prediction(predictions, treshhold)
     image_list = []
