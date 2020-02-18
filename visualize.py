@@ -1,4 +1,5 @@
 import utils
+import torch
 import numpy as np
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
@@ -61,14 +62,14 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     :param treshhold: remove predictions < threshold
     """
     predictions = utils.filter_prediction(predictions, treshhold)
-
+    # FIXME: wrong images count?
+    image_list = []
     for k, prediction in enumerate(predictions):
-        boxes = prediction['boxes']
-        labels = prediction['labels']
-        scores = prediction['scores']
-        masks = prediction['masks'] if 'masks' in prediction else None
-
-        image = Image.fromarray(images[k])
+        boxes = prediction['boxes'].cpu()
+        labels = prediction['labels'].cpu().detach().numpy()
+        scores = prediction['scores'].cpu().detach().numpy()
+        masks = prediction['masks'].cpu() if 'masks' in prediction else None
+        image = Image.fromarray(utils.reverse_normalization(images[k]))
         draw = ImageDraw.Draw(image)
 
         num_objects = boxes.shape[0]
@@ -77,21 +78,25 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
             x1, y1, x2, y2 = boxes[i]
 
             if display_boxes:
-                draw.rectangle(xy=((x1, y1), (x2, y2)), outline=colors[cls_id], width=cfg.THICKNESS_BBOX)
+                draw.rectangle(xy=((x1, y1), (x2, y2)), outline=colors[cls_id].tolist(), width=cfg.THICKNESS_BBOX)
 
             if display_caption:
                 class_name = cls_names[cls_id]
                 score = scores[i]
                 caption = '{} {:.3f}'.format(class_name, score)
-                font = ImageFont.truetype('config/fonts/Ubuntu-B.ttf', cfg.FONT_SIZE)
+                font = ImageFont.truetype('../config/fonts/Ubuntu-B.ttf', cfg.FONT_SIZE)
                 text_size = draw.textsize(caption, font)
-                draw.rectangle(xy=((x1, y1 - text_size[1] - 6), (x1 + text_size[0] + 4, y1)), fill=colors[cls_id])
+                draw.rectangle(xy=((x1, y1 - text_size[1] - 6), (x1 + text_size[0] + 4, y1)),
+                               fill=colors[cls_id].tolist())
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
             if display_masks and masks is not None:
                 pass
 
-    return images
+        image_list.append(image)
+
+    return image_list
+
 
 # def draw_bbox(img, prediction, cls_names, colors):
 #     """ Draws bounding boxes, scores and classes on image

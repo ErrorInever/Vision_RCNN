@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from config.classes.coco_labels import CLASS_NAMES
 
 
@@ -19,7 +20,7 @@ def reverse_normalization(tensor):
     :param tensor: image 3R tensor format
     :return: image numpy array format
     """
-    return tensor.permute(1, 2, 0).mul(255).numpy().copy()
+    return tensor.permute(1, 2, 0).mul(255).cpu().numpy().astype(np.uint8).copy()
 
 
 def flip_vert_tensor(tensor):
