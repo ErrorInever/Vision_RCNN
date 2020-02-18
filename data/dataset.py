@@ -2,13 +2,15 @@ import os
 import cv2
 from torchvision import transforms
 from torch.utils.data import Dataset
+from torch.utils.data.dataset import IterableDataset
 from PIL import Image
 from datetime import datetime
+from config.cfg import cfg
 import utils
 
 
 class Images(Dataset):
-    """Container for images"""
+    """Image dataset"""
 
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
@@ -31,8 +33,8 @@ class Images(Dataset):
         return transforms.Compose([transforms.ToTensor()])
 
 
-class Video:
-    """ Video container"""
+class Video(IterableDataset):
+    """ Iterable video dataset"""
 
     def __init__(self, video_path, save_path, flip):
         """
@@ -52,22 +54,10 @@ class Video:
         self.out = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.width, self.height))
         self.flip = flip
 
-    def __str__(self):
-        info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
-                                                                             self.__len__(),
-                                                                             self.width, self.height,
-                                                                             round(self.fps, 1))
-        return info
-
-    def __len__(self):
-        """ total number of video frames"""
-        return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
     def get_frame(self):
-        """convert frame to tensor and return object of generator frame by frame"""
+        """:return ``list[tensor]"""
         while self.cap.isOpened():
             ret, frame = self.cap.read()
-
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
@@ -78,3 +68,20 @@ class Video:
             else:
                 break
         self.cap.release()
+
+    # def get_stream(self):
+    #     return itertools.cycle(self.get_frame())
+
+    def __iter__(self):
+        return self.get_frame()
+
+    def __str__(self):
+        info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
+                                                                             self.__len__(),
+                                                                             self.width, self.height,
+                                                                             round(self.fps, 1))
+        return info
+
+    def __len__(self):
+        """ total number of video frames"""
+        return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))

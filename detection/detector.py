@@ -1,8 +1,8 @@
 import torch
 import os
 import utils
+import numpy as np
 from datetime import datetime
-
 import visualize
 from data.dataset import Images, Video
 from torch.utils.data import DataLoader
@@ -68,10 +68,25 @@ class Detector(Detect):
         :param out_path: path to output result
         :param threshold: threshold detection
         """
-        # video = Video(data_path, out_path, flip)
-        #
-        # for frames in tqdm(video.get_frame(), total=len(video)):
-        #     frames = [frame.to(self.device) for frame in frames]
+        video = Video(data_path, out_path, flip)
+        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE)
+
+        for batch in tqdm(dataloader):
+            images = [frame.to(self.device) for frame in batch]
+            with torch.no_grad():
+                predictions = self.model(images)
+
+            predictions = filter_prediction(predictions, threshold)
+            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False)
+
+            for i, img in enumerate(images):
+                img = np.uint8(img)
+                video.out.write(img)
+        video.out.release()
+        print('Done. Detect on video saves to {}'.format(video.save_path))
+
+        #for frame in tqdm(video.get_frame(), total=len(video)):
+        #    frame = [frame.to(self.device) for frame in frames]
         #
         #     with torch.no_grad():
         #         predictions = self.model(frames)
@@ -89,4 +104,6 @@ class Detector(Detect):
         #
         # video.out.release()
         # print('Done. Detect video saves to {}'.format(video.save_path))
-        pass
+
+detector = Detector(1, 1)
+detector.detect_on_video(r'C:\Users\Admin\Desktop\test_videos\test_cat.mp4', r'C:\Users\Admin\Desktop')
