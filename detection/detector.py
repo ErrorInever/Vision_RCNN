@@ -69,8 +69,9 @@ class Detector(Detect):
         :param threshold: threshold detection
         """
         video = Video(data_path, out_path, flip)
-        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE)
-
+        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, num_workers=cfg.NUM_WORKERS,
+                                collate_fn=utils.collate_fn)
+        # FIXME: tqdm doesn't work
         for batch in tqdm(dataloader):
             images = [frame.to(self.device) for frame in batch]
             with torch.no_grad():

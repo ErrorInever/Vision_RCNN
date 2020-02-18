@@ -64,7 +64,7 @@ class Video(IterableDataset):
                 frame = utils.img_to_tensor(frame)
                 if self.flip:
                     frame = utils.flip_vert_tensor(frame)
-                yield [frame]
+                yield frame
             else:
                 break
         self.cap.release()

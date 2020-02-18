@@ -87,6 +87,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 class_name = cls_names[cls_id]
                 score = scores[i]
                 caption = '{} {}%'.format(class_name, round(score * 100, 1))
+                # FIXME: exception doesn't work
                 try:
                     font = ImageFont.truetype(cfg.PATH_TO_FONT, cfg.FONT_SIZE)
                 except IOError:
