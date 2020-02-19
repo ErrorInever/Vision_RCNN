@@ -64,9 +64,8 @@ def filter_prediction(predictions, treshhold):
         }
 
         if 'masks' in prediction:
-            sample = {
-                'masks': prediction['masks'][:tresh]
-            }
+            sample['masks'] = prediction['masks'][:tresh]
+
         samples.append(sample)
 
     return samples
