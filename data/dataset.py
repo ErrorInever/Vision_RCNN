@@ -5,19 +5,21 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataset import IterableDataset
 from PIL import Image
 from datetime import datetime
-from config.cfg import cfg
 import utils
 
 
 class Images(Dataset):
     """Image dataset"""
-
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
         self.img_path = img_path
         self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
 
     def __getitem__(self, idx):
+        """
+        :param idx: image id
+        :return: ``tensor`` of image
+        """
         img = Image.open(os.path.join(self.img_path, self.img_names[idx])).convert('RGB')
         return self.img_to_tensor(img)
 
@@ -29,17 +31,17 @@ class Images(Dataset):
 
     @property
     def img_to_tensor(self):
-        """Convert an image to tensor"""
+        """Convert image to tensor"""
         return transforms.Compose([transforms.ToTensor()])
 
 
 class Video(IterableDataset):
-    """ Iterable video dataset"""
+    """Video dataset"""
     def __init__(self, video_path, save_path, flip):
         """
         :param video_path: path to a video file
         :param save_path: path to output directory
-        :param flip: if true - flip video. NOTE: expensive operation.
+        :param flip: if true - flip video. Warning: it is expensive operation.
         """
         self.cap = cv2.VideoCapture(video_path)
         self.video_path = video_path
@@ -54,7 +56,10 @@ class Video(IterableDataset):
         self.flip = flip
 
     def get_frame(self):
-        """:return ``list[tensor]"""
+        """
+        Video stream
+        :yield ``tensor`` of image
+        """
         while self.cap.isOpened():
             ret, frame = self.cap.read()
             if ret:
@@ -70,6 +75,7 @@ class Video(IterableDataset):
 
     @property
     def __iter__(self):
+        """:return: iterator of video stream"""
         return self.get_frame
 
     def __str__(self):
@@ -80,5 +86,5 @@ class Video(IterableDataset):
         return info
 
     def __len__(self):
-        """ total number of video frames"""
+        """:return Total number of video frames"""
         return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
