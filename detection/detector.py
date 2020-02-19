@@ -9,7 +9,6 @@ from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.cls import Detect
-from utils import filter_prediction
 from visualize import display_objects
 from config.cfg import cfg
 
@@ -36,7 +35,7 @@ class Detector(Detect):
         super().__init__(model, device)
 
     @execution_time
-    def detect_on_images(self, img_path, out_path, threshold=0.7):
+    def detect_on_images(self, img_path, out_path, threshold):
         """
         Detects objects on images and saves it
         :param img_path: path to images data
@@ -53,15 +52,15 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            predictions = filter_prediction(predictions, threshold)
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False)
+            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False,
+                                     threshold=threshold)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 img.save(save_path, format="PNG")
 
     @execution_time
-    def detect_on_video(self, data_path, out_path, threshold=0.7, flip=False):
+    def detect_on_video(self, data_path, out_path, threshold, flip=False):
         """
         Detects objects on video and saves it
         :param flip: if true - flip video
@@ -78,8 +77,8 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            predictions = filter_prediction(predictions, threshold)
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False)
+            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False,
+                                     threshold=threshold)
 
             for i, img in enumerate(images):
                 img = np.uint8(img)

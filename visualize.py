@@ -43,7 +43,7 @@ def assign_colors(classes):
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes=True,
-                    display_masks=True, display_caption=True, treshhold=0.7):
+                    display_masks=True, display_caption=True, threshold=0.7):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images
@@ -63,10 +63,10 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
-    :param treshhold: removes predictions < threshold
+    :param threshold: removes predictions < threshold
     :return ``List[[numpy_array]]``, list of images
     """
-    predictions = utils.filter_prediction(predictions, treshhold)
+    predictions = utils.filter_prediction(predictions, threshold)
     image_list = []
     for k, prediction in enumerate(predictions):
         boxes = prediction['boxes'].cpu()
