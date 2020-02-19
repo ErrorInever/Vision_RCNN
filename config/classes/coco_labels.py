@@ -1,3 +1,5 @@
+# dictionary of coco class names
+
 CLASS_NAMES = {
     0: 'unlabeled',
     1: 'person',
