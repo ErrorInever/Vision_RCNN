@@ -1,6 +1,7 @@
 from easydict import EasyDict as edict
 
 __C = edict()
+# for consumers
 cfg = __C
 
 # params
@@ -17,4 +18,5 @@ __C.WIDTH_TEXT_BBOX = 4
 __C.PATH_TO_FONT = None
 # font size
 __C.FONT_SIZE = 10
+__C.FONT_COLOR = (0, 0, 0)
 

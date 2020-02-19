@@ -15,7 +15,7 @@ from config.cfg import cfg
 
 
 def execution_time(func):
-    """print wasted time of function"""
+    """Print wasted time of function"""
     def wrapped(*args, **kwargs):
         start_time = datetime.now()
         res = func(*args, **kwargs)

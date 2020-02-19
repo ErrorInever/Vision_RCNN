@@ -45,6 +45,7 @@ def assign_colors(classes):
 def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                     display_masks=True, display_caption=True, treshhold=0.7):
     """
+    Display objects on images
     :param images: ``List[[Tensor]]``, list of images
     :param predictions:
     ``List[Dict[Tensor]]``, one for each input image. The fields of the ``Dict`` are as
@@ -97,7 +98,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 draw.rectangle(xy=((x1, y1 - text_size[1] - cfg.HEIGHT_TEXT_BBOX),
                                    (x1 + text_size[0] + cfg.WIDTH_TEXT_BBOX, y1)),
                                fill=colors[cls_id])
-                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
+                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=cfg.FONT_COLOR)
 
             if display_masks and masks is not None:
                 pass
@@ -106,34 +107,3 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
 
     return image_list
 
-# def draw_bbox(img, prediction, cls_names, colors):
-#     """ Draws bounding boxes, scores and classes on image
-#     :param img: tensor
-#     :param prediction: dictionary
-#     {boxes: [[x1, y1, x2, y2], ...],
-#      scores: [float],
-#      labels: [int]}
-#     :param cls_names: dictionary class names
-#     :param colors: numpy array of colors
-#     """
-#     img = img.permute(1, 2, 0).cpu().numpy().copy()
-#     img = img * 255
-#     boxes = prediction['boxes'].cpu()
-#     scores = prediction['scores'].cpu().detach().numpy()
-#     labels = prediction['labels'].cpu().detach().numpy()
-#
-#     for i, bbox in enumerate(boxes):
-#         score = round(scores[i]*100, 1)
-#         label = labels[i]
-#         p1, p2 = tuple(bbox[:2]), tuple(bbox[2:])
-#         cv2.rectangle(img, p1, p2, color=colors[label], thickness=cfg.THICKNESS_BBOX)
-#         text = '{cls} {prob}%'.format(cls=cls_names[label], prob=score)
-#         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, cfg.TEXT_SIZE, 1)[0]
-#
-#         p3 = (p1[0] - 2, p1[1] - text_size[1] - 6)
-#         p4 = (p1[0] + text_size[0] + 4, p1[1])
-#
-#         cv2.rectangle(img, p3, p4, color=colors[label], thickness=-1)
-#         cv2.putText(img, text, (p1[0], p1[1] - text_size[1] + 6), fontFace=cv2.FONT_HERSHEY_PLAIN,
-#                     fontScale=cfg.TEXT_SIZE, color=(0, 0, 0), thickness=1)
-#     return img
