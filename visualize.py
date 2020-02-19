@@ -42,6 +42,21 @@ def assign_colors(classes):
     return colors
 
 
+def apply_mask(image, mask, color, alpha=0.5):
+    """
+    Applying mask on image
+    :param image: numpy array
+    :param mask:
+    :param color:
+    :param alpha:
+    :return:
+    """
+    for c in range(3):
+        image[..., c] = np.where(mask == 1, image[..., c] * (1 - alpha) + alpha * color[c], image[..., c])
+
+    return image
+
+
 def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                     display_masks=True, display_caption=True, threshold=0.7):
     """
@@ -98,10 +113,12 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 draw.rectangle(xy=((x1, y1 - text_size[1] - cfg.HEIGHT_TEXT_BBOX),
                                    (x1 + text_size[0] + cfg.WIDTH_TEXT_BBOX, y1)),
                                fill=colors[cls_id])
-                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=cfg.FONT_COLOR)
+                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
             if display_masks and masks is not None:
-                pass
+                mask = masks[..., i]
+                masked_image = apply_mask(image, mask, colors[cls_id], alpha=0.7)
+                # TODO
 
         image_list.append(image)
 
