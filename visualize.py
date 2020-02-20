@@ -42,17 +42,19 @@ def assign_colors(classes):
     return colors
 
 
-def apply_mask(image, mask, color, alpha=0.5):
+def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     """
-    Applying mask on image
+    Applying mask to image and thresholding
     :param image: numpy array
     :param mask:
     :param color:
+    :param threshold:
     :param alpha:
     :return:
     """
     for c in range(3):
-        image[..., c] = np.where(mask == 1, image[..., c] * (1 - alpha) + alpha * color[c], image[..., c])
+        image[..., c] = np.where(mask >= threshold,
+                                 image[..., c] * (1 - alpha) + alpha * color[c], image[..., c])
 
     return image
 
@@ -87,7 +89,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
         boxes = prediction['boxes'].cpu()
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
-        masks = prediction['masks'].cpu() if 'masks' in prediction else None
+        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         image = Image.fromarray(utils.reverse_normalization(images[k]))
         draw = ImageDraw.Draw(image)
 
@@ -116,9 +118,8 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
             if display_masks and masks is not None:
-                mask = masks[..., i]
-                masked_image = apply_mask(image, mask, colors[cls_id], alpha=0.7)
-                # TODO
+                mask = masks[i, ...]
+                apply_mask(image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
 
         image_list.append(image)
 
