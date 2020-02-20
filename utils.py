@@ -20,7 +20,7 @@ def reverse_normalization(tensor):
     :param tensor: ``tensor(3, H, W)``
     :return: ``numpy_array [H, W, 3]``
     """
-    return tensor.permute(1, 2, 0).mul(255).cpu().numpy().astype(np.uint8).copy()
+    return tensor.permute(1, 2, 0).mul(255).cpu().byte().numpy()
 
 
 def flip_vert_tensor(tensor):

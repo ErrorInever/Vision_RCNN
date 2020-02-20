@@ -90,8 +90,8 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
         masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
-        draw = ImageDraw.Draw(image)
+        image = utils.reverse_normalization(images[k])
+        draw = ImageDraw.Draw(Image.fromarray(image.astype(np.uint8)))
 
         num_objects = boxes.shape[0]
         for i in range(num_objects):
