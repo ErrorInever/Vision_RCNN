@@ -52,8 +52,8 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False,
-                                     threshold=threshold)
+            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=True,
+                                     display_boxes=True, display_caption=True, threshold=threshold)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
@@ -77,8 +77,8 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=False,
-                                     threshold=threshold)
+            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=True,
+                                     display_boxes=True, display_caption=True, threshold=threshold)
 
             for i, img in enumerate(images):
                 img = np.uint8(img)

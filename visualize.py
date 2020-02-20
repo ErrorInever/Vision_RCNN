@@ -117,7 +117,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                                fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
-            if display_masks and masks is not None:
+            if display_masks and (masks is not None):
                 mask = masks[i, ...]
                 apply_mask(image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
 
