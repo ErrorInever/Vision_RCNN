@@ -85,17 +85,18 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     """
     predictions = utils.filter_prediction(predictions, threshold)
     image_list = []
+
     for k, prediction in enumerate(predictions):
         boxes = prediction['boxes'].cpu()
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
         masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
-        draw = ImageDraw.Draw(image)
-        masked_image = np.array(image)
 
-        num_objects = boxes.shape[0]
-        for i in range(num_objects):
+        image = Image.fromarray(utils.reverse_normalization(images[k]))
+
+        draw = ImageDraw.Draw(image)
+        num_boxes = boxes.shape[0]
+        for i in range(num_boxes):
             cls_id = labels[i]
             x1, y1, x2, y2 = boxes[i]
 
@@ -118,9 +119,16 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                                fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
-            if display_masks and (masks is not None):
+        if display_masks and (masks is not None):
+            num_masks = masks.shape[0]
+            image = np.array(image)
+            for i in range(num_masks):
+                cls_id = labels[i]
                 mask = masks[i, ...]
-                masked_image = apply_mask(masked_image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
+                apply_mask(image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
+
+        if not isinstance(image, np.ndarray):
+            image = np.array(image)
 
         image_list.append(image)
 

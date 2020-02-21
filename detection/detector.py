@@ -2,6 +2,7 @@ import torch
 import os
 import utils
 import math
+import cv2
 import numpy as np
 from datetime import datetime
 import visualize
@@ -57,7 +58,7 @@ class Detector(Detect):
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
-                img.save(save_path, format="PNG")
+                cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
     @execution_time
     def detect_on_video(self, data_path, out_path, threshold, flip=False):
