@@ -41,7 +41,7 @@ if __name__ == '__main__':
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device:{}'.format(device))
 
-    model = models.get_model_faster_rcnn()
+    model = models.get_model_mask_rcnn()
 
     model.to(device)
     model.eval()

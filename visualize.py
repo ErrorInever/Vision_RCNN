@@ -42,8 +42,25 @@ def assign_colors(classes):
     return colors
 
 
+def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
+    """
+    Applying mask to image and thresholding
+    :param image: numpy array
+    :param mask:
+    :param color:
+    :param threshold:
+    :param alpha:
+    :return:
+    """
+    for c in range(3):
+        image[..., c] = np.where(mask >= threshold,
+                                 image[..., c] * (1 - alpha) + alpha * color[c], image[..., c])
+
+    return image
+
+
 def display_objects(images, predictions, cls_names, colors, display_boxes=True,
-                    display_masks=True, display_caption=True, treshhold=0.7):
+                    display_masks=True, display_caption=True, threshold=0.7):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images
@@ -63,18 +80,18 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
-    :param treshhold: removes predictions < threshold
+    :param threshold: removes predictions < threshold
     :return ``List[[numpy_array]]``, list of images
     """
-    predictions = utils.filter_prediction(predictions, treshhold)
+    predictions = utils.filter_prediction(predictions, threshold)
     image_list = []
     for k, prediction in enumerate(predictions):
         boxes = prediction['boxes'].cpu()
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
-        masks = prediction['masks'].cpu() if 'masks' in prediction else None
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
-        draw = ImageDraw.Draw(image)
+        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
+        image = utils.reverse_normalization(images[k])
+        draw = ImageDraw.Draw(Image.fromarray(image.astype(np.uint8)))
 
         num_objects = boxes.shape[0]
         for i in range(num_objects):
@@ -98,10 +115,11 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
                 draw.rectangle(xy=((x1, y1 - text_size[1] - cfg.HEIGHT_TEXT_BBOX),
                                    (x1 + text_size[0] + cfg.WIDTH_TEXT_BBOX, y1)),
                                fill=colors[cls_id])
-                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=cfg.FONT_COLOR)
+                draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
-            if display_masks and masks is not None:
-                pass
+            if display_masks and (masks is not None):
+                mask = masks[i, ...]
+                apply_mask(image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
 
         image_list.append(image)
 
