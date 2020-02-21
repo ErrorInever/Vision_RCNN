@@ -38,8 +38,10 @@ if __name__ == '__main__':
     if torch.cuda.is_available() and not args.use_gpu:
         print('You have a GPU device, so you should probably run with --use_gpu')
         device = torch.device('cpu')
-    else:
+    elif torch.cuda.is_available() and args.use_gpu:
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = torch.device('cpu')
 
     print('Using device:{}'.format(device))
 

@@ -67,8 +67,9 @@ class Detector(Detect):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-    # @execution_time
-    # def detect_on_video(self, data_path, out_path, threshold, flip=False):
+    @execution_time
+    def detect_on_video(self, data_path, out_path, threshold, flip=False):
+        pass
     #     """
     #     Detects objects on video and saves it
     #     :param flip: if true - flip video
