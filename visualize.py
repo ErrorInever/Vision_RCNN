@@ -1,7 +1,7 @@
-import utils
 import numpy as np
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
+from detection import utils
 
 
 def random_colors(classes):
@@ -45,11 +45,11 @@ def assign_colors(classes):
 def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     """
     Applying mask to image and thresholding
-    :param image: numpy array
-    :param mask:
-    :param color:
-    :param threshold:
-    :param alpha:
+    :param image: ``Numpy array [H, W, 3]``
+    :param mask: ``Numpy array[H, W]``
+    :param color: ``Tuple(R,G,B)``, list of colors format RGB
+    :param threshold: soft masks
+    :param alpha: pixel overlay opacity
     :return:
     """
     for c in range(3):
@@ -59,8 +59,9 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     return image
 
 
-def display_objects(images, predictions, cls_names, colors, display_boxes=True,
-                    display_masks=True, display_caption=True, threshold=0.7):
+def display_objects(images, predictions, cls_names, colors, display_boxes,
+                    display_masks, display_caption, score_threshold,
+                    mask_threshold, mask_alpha):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images
@@ -80,10 +81,12 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
-    :param threshold: removes predictions < threshold
+    :param score_threshold: removes predictions < threshold
+    :param mask_threshold: soft masks thresholded
+    :param mask_alpha: pixel overlay opacity
     :return ``List[[numpy_array]]``, list of images
     """
-    predictions = utils.filter_prediction(predictions, threshold)
+    predictions = utils.filter_prediction(predictions, score_threshold)
     image_list = []
 
     for k, prediction in enumerate(predictions):
@@ -125,12 +128,10 @@ def display_objects(images, predictions, cls_names, colors, display_boxes=True,
             for i in range(num_masks):
                 cls_id = labels[i]
                 mask = masks[i, ...]
-                apply_mask(image, mask, colors[cls_id], threshold=0.5, alpha=0.5)
+                apply_mask(image, mask, colors[cls_id], threshold=mask_threshold, alpha=mask_alpha)
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)
 
         image_list.append(image)
-
     return image_list
-

@@ -1,6 +1,6 @@
 import torch
 import os
-import utils
+from detection import utils
 import math
 import cv2
 import numpy as np
@@ -36,12 +36,14 @@ class Detector(Detect):
         super().__init__(model, device)
 
     @execution_time
-    def detect_on_images(self, img_path, out_path, threshold):
+    def detect_on_images(self, img_path, out_path, display_masks=True, display_boxes=True, display_caption=True):
         """
         Detects objects on images and saves it
+        :param display_caption: if true - displays caption on image
+        :param display_boxes: if true - displays boxes on image
+        :param display_masks: if true - displays masks on image
         :param img_path: path to images data
         :param out_path: path to output results
-        :param threshold: threshold detection
         """
         img_dataset = Images(img_path)
         dataloader = DataLoader(img_dataset, batch_size=cfg.BATCH_SIZE, num_workers=cfg.NUM_WORKERS, shuffle=False,
@@ -53,36 +55,41 @@ class Detector(Detect):
             with torch.no_grad():
                 predictions = self.model(images)
 
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=True,
-                                     display_boxes=True, display_caption=True, threshold=threshold)
+            images = display_objects(images, predictions, self.cls_names, self.colors,
+                                     display_masks=display_masks,
+                                     display_boxes=display_boxes,
+                                     display_caption=display_caption,
+                                     score_threshold=cfg.SCORE_THRESHOLD,
+                                     mask_threshold=cfg.MASK_THRESHOLD,
+                                     mask_alpha=cfg.MASK_ALPHA)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-    @execution_time
-    def detect_on_video(self, data_path, out_path, threshold, flip=False):
-        """
-        Detects objects on video and saves it
-        :param flip: if true - flip video
-        :param data_path: path to video
-        :param out_path: path to output result
-        :param threshold: threshold detection
-        """
-        video = Video(data_path, out_path, flip)
-        # FIXME: num_workers makes infinity loop
-        dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, collate_fn=utils.collate_fn)
-
-        for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
-            images = [frame.to(self.device) for frame in batch]
-            with torch.no_grad():
-                predictions = self.model(images)
-
-            images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=True,
-                                     display_boxes=True, display_caption=True, threshold=threshold)
-
-            for i, img in enumerate(images):
-                img = np.uint8(img)
-                video.out.write(img)
-        video.out.release()
-        print('Done. Detect on video saves to {}'.format(video.save_path))
+    # @execution_time
+    # def detect_on_video(self, data_path, out_path, threshold, flip=False):
+    #     """
+    #     Detects objects on video and saves it
+    #     :param flip: if true - flip video
+    #     :param data_path: path to video
+    #     :param out_path: path to output result
+    #     :param threshold: threshold detection
+    #     """
+    #     video = Video(data_path, out_path, flip)
+    #     # FIXME: num_workers makes infinity loop
+    #     dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, collate_fn=utils.collate_fn)
+    #
+    #     for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
+    #         images = [frame.to(self.device) for frame in batch]
+    #         with torch.no_grad():
+    #             predictions = self.model(images)
+    #
+    #         images = display_objects(images, predictions, self.cls_names, self.colors, display_masks=True,
+    #                                  display_boxes=True, display_caption=True, threshold=threshold)
+    #
+    #         for i, img in enumerate(images):
+    #             img = np.uint8(img)
+    #             video.out.write(img)
+    #     video.out.release()
+    #     print('Done. Detect on video saves to {}'.format(video.save_path))

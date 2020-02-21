@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataset import IterableDataset
 from PIL import Image
 from datetime import datetime
-import utils
+from detection import utils
 
 
 class Images(Dataset):
