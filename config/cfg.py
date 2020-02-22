@@ -4,19 +4,27 @@ __C = edict()
 # for consumers
 cfg = __C
 
-# params
+# data params
 __C.BATCH_SIZE = 10
 __C.NUM_WORKERS = 4
-__C.THRESHOLD = 0.7
 
-# bbox
+# object threshold
+__C.SCORE_THRESHOLD = 0.7
+
+# mask
+__C.MASK_THRESHOLD = 0.5
+__C.MASK_ROUGH_THRESHOLD = 130
+__C.MASK_ROUGH_MAXVAL = 255
+__C.MASK_ALPHA = 0.5
+__C.MASK_CONTOUR_THICKNESS = 2
+
+# bounding boxes display params
 __C.THICKNESS_BBOX = 3
 __C.HEIGHT_TEXT_BBOX = 1
 __C.WIDTH_TEXT_BBOX = 4
 
-# path to font
+# fonts params
 __C.PATH_TO_FONT = 'FasterRCNN_implementation/config/fonts/Ubuntu-B.ttf'
-# font size
-__C.FONT_SIZE = 10
+__C.FONT_SIZE = 14
 __C.FONT_COLOR = (0, 0, 0)
 

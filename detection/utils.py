@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 from config.classes.coco_labels import CLASS_NAMES
 
 

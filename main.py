@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--outdir', dest='outdir',
                         help='directory to save results, default save to /output',
                         default='output', type=str)
-    parser.add_argument('--flip', dest='flip', help='flip video. Warning: expensive operation',
+    parser.add_argument('--flip_video', dest='flip', help='flip video. Warning: expensive operation',
                         action='store_true')
     parser.add_argument('--use_gpu', dest='use_gpu',
                         help='whether use GPU, if the GPU is unavailable then the CPU will be used',
@@ -32,24 +32,28 @@ if __name__ == '__main__':
         os.makedirs('output')
         args.outdir = 'output'
 
-    if args.images is args.video:
+    if (args.images and args.video) is not None:
         raise RuntimeError('path to images and videos not specified')
 
     if torch.cuda.is_available() and not args.use_gpu:
         print('You have a GPU device, so you should probably run with --use_gpu')
+        device = torch.device('cpu')
+    elif torch.cuda.is_available() and args.use_gpu:
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = torch.device('cpu')
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device:{}'.format(device))
 
     model = models.get_model_mask_rcnn()
-
     model.to(device)
     model.eval()
     detector = Detector(model, device)
 
     if args.images:
-        detector.detect_on_images(args.images, args.outdir, threshold=cfg.THRESHOLD)
+        detector.detect_on_images(args.images, args.outdir)
     elif args.video:
-        detector.detect_on_video(args.video, args.outdir, threshold=cfg.THRESHOLD, flip=args.flip)
+        pass
+        # detector.detect_on_video(args.video, args.outdir, threshold=cfg.SCORE_THRESHOLD, flip=args.flip)
     else:
         raise RuntimeError('Something went wrong...')
