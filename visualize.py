@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
@@ -58,7 +59,7 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
 
     return image
 
-
+# TODO: border around mask, find center of object, video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
                     display_masks, display_caption, score_threshold,
                     mask_threshold, mask_alpha):
@@ -129,6 +130,10 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 cls_id = labels[i]
                 mask = masks[i, ...]
                 apply_mask(image, mask, colors[cls_id], threshold=mask_threshold, alpha=mask_alpha)
+                # draw contours around mask
+                _, rough_mask = cv2.threshold(mask, thresh=130, maxval=255, type=cv2.THRESH_BINARY)
+                contours, hierarchy = cv2.findContours(rough_mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+                cv2.drawContours(image, contours, contourIdx=0, color=colors[cls_id], thickness=2)
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)
