@@ -84,8 +84,10 @@ class Detector(Detect):
 
         for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
             images = [frame.to(self.device) for frame in batch]
+
             with torch.no_grad():
                 predictions = self.model(images)
+                predictions = utils.filter_prediction(predictions, cfg.SCORE_THRESHOLD)
 
             images = display_objects(images, predictions, self.cls_names, self.colors,
                                      display_masks=display_masks,

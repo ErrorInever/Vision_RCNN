@@ -85,15 +85,14 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param score_threshold: removes predictions < threshold
     :return ``List[[numpy_array]]``, list of images
     """
-    predictions = utils.filter_prediction(predictions, score_threshold)
     image_list = []
 
     for k, prediction in enumerate(predictions):
         image = Image.fromarray(utils.reverse_normalization(images[k]))
         boxes = prediction['boxes'].cpu()
+        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
-        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
         for i in range(num_boxes):

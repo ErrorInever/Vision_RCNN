@@ -46,8 +46,8 @@ if __name__ == '__main__':
     print('Using device:{}'.format(device))
 
     model = models.get_model_mask_rcnn()
-    model.to(device)
     model.eval()
+    model.to(device)
     detector = Detector(model, device)
 
     if args.images:
