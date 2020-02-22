@@ -22,7 +22,7 @@ def assign_colors(classes):
     :param classes: ``Dict[class_id, "name of class"]``, dictionary of class names
     :return: ``Tuple(Tuple(R,G,B))``, list of colors format RGB
     """
-    colors = np.random.randint(80, 255, size=(len(classes), 3))
+    colors = np.random.randint(80, 255, size=(len(classes), 3), dtype='int32')
     # bio
     colors[1] = [204, 6, 5]  # person
     colors[16] = [118, 255, 122]  # bird
@@ -59,10 +59,10 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
 
     return image
 
+
 # TODO: border around mask, find center of object, video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, score_threshold,
-                    mask_threshold, mask_alpha):
+                    display_masks, display_caption, score_threshold):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images
@@ -83,8 +83,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
     :param score_threshold: removes predictions < threshold
-    :param mask_threshold: soft masks thresholded
-    :param mask_alpha: pixel overlay opacity
     :return ``List[[numpy_array]]``, list of images
     """
     predictions = utils.filter_prediction(predictions, score_threshold)
@@ -125,15 +123,19 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
 
         if display_masks and (masks is not None):
             num_masks = masks.shape[0]
-            image = np.array(image)
+            image = np.array(image, dtype=np.uint8)
             for i in range(num_masks):
-                cls_id = labels[i]
                 mask = masks[i, ...]
-                apply_mask(image, mask, colors[cls_id], threshold=mask_threshold, alpha=mask_alpha)
+                cls_id = labels[i]
+                color_contour = tuple(map(int, colors[cls_id]))
+                apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
                 # draw contours around mask
-                _, rough_mask = cv2.threshold(mask, thresh=130, maxval=255, type=cv2.THRESH_BINARY)
-                contours, hierarchy = cv2.findContours(rough_mask, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
-                cv2.drawContours(image, contours, contourIdx=0, color=colors[cls_id], thickness=2)
+                _, rough_mask = cv2.threshold(mask.squeeze(0) * 255, thresh=cfg.MASK_ROUGH_THRESHOLD,
+                                              maxval=cfg.MASK_ROUGH_MAXVAL, type=cv2.THRESH_BINARY)
+                contours, hierarchy = cv2.findContours(rough_mask.astype(np.uint8),
+                                                       mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+                cv2.drawContours(image, contours, contourIdx=0, color=color_contour,
+                                 thickness=cfg.MASK_CONTOUR_THICKNESS)
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)

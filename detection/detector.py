@@ -59,9 +59,7 @@ class Detector(Detect):
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
                                      display_caption=display_caption,
-                                     score_threshold=cfg.SCORE_THRESHOLD,
-                                     mask_threshold=cfg.MASK_THRESHOLD,
-                                     mask_alpha=cfg.MASK_ALPHA)
+                                     score_threshold=cfg.SCORE_THRESHOLD)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))

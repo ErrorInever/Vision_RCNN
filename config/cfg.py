@@ -8,10 +8,15 @@ cfg = __C
 __C.BATCH_SIZE = 10
 __C.NUM_WORKERS = 4
 
-# thresholds
+# object threshold
 __C.SCORE_THRESHOLD = 0.7
+
+# mask
 __C.MASK_THRESHOLD = 0.5
+__C.MASK_ROUGH_THRESHOLD = 130
+__C.MASK_ROUGH_MAXVAL = 255
 __C.MASK_ALPHA = 0.5
+__C.MASK_CONTOUR_THICKNESS = 2
 
 # bounding boxes display params
 __C.THICKNESS_BBOX = 3
