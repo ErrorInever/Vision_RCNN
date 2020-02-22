@@ -53,7 +53,6 @@ if __name__ == '__main__':
     if args.images:
         detector.detect_on_images(args.images, args.outdir)
     elif args.video:
-        pass
-        # detector.detect_on_video(args.video, args.outdir, threshold=cfg.SCORE_THRESHOLD, flip=args.flip)
+        detector.detect_on_video(args.video, args.outdir, flip=args.flip)
     else:
         raise RuntimeError('Something went wrong...')
