@@ -60,7 +60,7 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     return image
 
 
-# TODO: border around mask, find center of object, video inference, draws overlap, iou, layers of net
+# TODO: video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
                     display_masks, display_caption, score_threshold):
     """
@@ -136,6 +136,17 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                                                        mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
                 cv2.drawContours(image, contours, contourIdx=0, color=color_contour,
                                  thickness=cfg.MASK_CONTOUR_THICKNESS)
+
+                # draw center of contour
+                m = cv2.moments(contours)
+                try:
+                    x_center = int(m["m10"] / m["m00"])
+                    y_center = int(m["m01"] / m["m00"])
+                    cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
+                    cv2.putText(image, "center}", (x_center - 20, y_center - 20),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                except ZeroDivisionError:
+                    continue
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)
