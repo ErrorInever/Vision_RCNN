@@ -66,8 +66,8 @@ class Detector(Detect):
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
     @execution_time
-    def detect_on_video(self, data_path, out_path, threshold,
-                        display_masks=True, display_boxes=True, display_caption=True, flip=False):
+    def detect_on_video(self, data_path, out_path, display_masks=True, display_boxes=True, display_caption=True,
+                        flip=False):
         """
         Detects objects on video and saves it
         :param display_caption: if true - displays caption on video
@@ -94,6 +94,6 @@ class Detector(Detect):
                                      score_threshold=cfg.SCORE_THRESHOLD)
 
             for i, img in enumerate(images):
-                video.out.write(img.astype(np.uint8))
+                video.out.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
         video.out.release()
         print('Done. Detect on video saves to {}'.format(video.save_path))

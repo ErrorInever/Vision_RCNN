@@ -89,13 +89,11 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     image_list = []
 
     for k, prediction in enumerate(predictions):
+        image = Image.fromarray(utils.reverse_normalization(images[k]))
         boxes = prediction['boxes'].cpu()
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
         masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
-
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
-
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
         for i in range(num_boxes):
@@ -138,7 +136,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                                  thickness=cfg.MASK_CONTOUR_THICKNESS)
 
                 # draw center of contour
-                m = cv2.moments(contours)
+                m = cv2.moments(contours[0])
                 try:
                     x_center = int(m["m10"] / m["m00"])
                     y_center = int(m["m01"] / m["m00"])
@@ -146,7 +144,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                     continue
                 else:
                     cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
-                    cv2.putText(image, "center}", (x_center - 20, y_center - 20),
+                    cv2.putText(image, "center", (x_center - 20, y_center - 20),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
         if not isinstance(image, np.ndarray):
