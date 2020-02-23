@@ -57,13 +57,13 @@ def filter_prediction(predictions, treshhold):
     for i, prediction in enumerate(predictions):
         tresh = len([x for x in predictions[i]['scores'] if x >= treshhold])
         sample = {
-            'boxes': prediction['boxes'][:tresh],
-            'labels': prediction['labels'][:tresh],
-            'scores': prediction['scores'][:tresh],
+            'boxes': prediction['boxes'][:tresh].cpu(),
+            'labels': prediction['labels'][:tresh].cpu(),
+            'scores': prediction['scores'][:tresh].cpu(),
         }
 
         if 'masks' in prediction:
-            sample['masks'] = prediction['masks'][:tresh]
+            sample['masks'] = prediction['masks'][:tresh].cpu()
 
         samples.append(sample)
 

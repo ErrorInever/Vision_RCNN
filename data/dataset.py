@@ -1,5 +1,6 @@
 import os
 import cv2
+import logging
 from torchvision import transforms
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import IterableDataset
@@ -7,13 +8,18 @@ from PIL import Image
 from datetime import datetime
 from detection import utils
 
+logger = logging.getLogger(__name__)
+
 
 class Images(Dataset):
     """Image dataset"""
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
         self.img_path = img_path
-        self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
+        try:
+            self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
+        except FileNotFoundError as e:
+            logger.exception('File not found')
 
     def __getitem__(self, idx):
         """
@@ -65,7 +71,8 @@ class Video(IterableDataset):
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
-                frame = utils.img_to_tensor(frame)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                frame = self.img_to_tensor(frame)
                 if self.flip:
                     frame = utils.flip_vert_tensor(frame)
                 yield frame
@@ -77,6 +84,11 @@ class Video(IterableDataset):
     def __iter__(self):
         """:return: iterator of video stream"""
         return self.get_frame
+
+    @property
+    def img_to_tensor(self):
+        """Convert image to tensor"""
+        return transforms.Compose([transforms.ToTensor()])
 
     def __str__(self):
         info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),

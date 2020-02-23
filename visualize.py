@@ -1,8 +1,11 @@
 import numpy as np
 import cv2
+import logging
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
+
+logger = logging.getLogger(__name__)
 
 
 def random_colors(classes):
@@ -62,10 +65,10 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
 
 # TODO: video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, score_threshold):
+                    display_masks, display_caption):
     """
     Display objects on images
-    :param images: ``List[[Tensor]]``, list of images
+    :param images: ``List[[Tensor]]``, list of images (B,G,R)
     :param predictions:
     ``List[Dict[Tensor]]``, one for each input image. The fields of the ``Dict`` are as
     follows:
@@ -82,20 +85,16 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
-    :param score_threshold: removes predictions < threshold
     :return ``List[[numpy_array]]``, list of images
     """
-    predictions = utils.filter_prediction(predictions, score_threshold)
     image_list = []
 
     for k, prediction in enumerate(predictions):
+        image = Image.fromarray(utils.reverse_normalization(images[k]))
         boxes = prediction['boxes'].cpu()
+        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
-        masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
-
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
-
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
         for i in range(num_boxes):
@@ -113,6 +112,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 try:
                     font = ImageFont.truetype(cfg.PATH_TO_FONT, cfg.FONT_SIZE)
                 except IOError:
+                    logger.exception('Font error')
                     font = ImageFont.load_default()
 
                 text_size = draw.textsize(caption, font)
@@ -138,15 +138,16 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                                  thickness=cfg.MASK_CONTOUR_THICKNESS)
 
                 # draw center of contour
-                m = cv2.moments(contours)
+                m = cv2.moments(contours[0])
                 try:
                     x_center = int(m["m10"] / m["m00"])
                     y_center = int(m["m01"] / m["m00"])
                 except ZeroDivisionError:
+                    logger.exception('Center is zero')
                     continue
                 else:
                     cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
-                    cv2.putText(image, "center}", (x_center - 20, y_center - 20),
+                    cv2.putText(image, "center", (x_center - 20, y_center - 20),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
         if not isinstance(image, np.ndarray):
