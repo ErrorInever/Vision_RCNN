@@ -1,1 +1,1 @@
-Simple pytorch implementation for test
+Study project for own visualization of like-rcnn nets
