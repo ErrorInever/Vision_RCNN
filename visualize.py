@@ -1,8 +1,11 @@
 import numpy as np
 import cv2
+import logging
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
+
+logger = logging.getLogger(__name__)
 
 
 def random_colors(classes):
@@ -62,7 +65,7 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
 
 # TODO: video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, score_threshold):
+                    display_masks, display_caption):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images
@@ -82,7 +85,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
-    :param score_threshold: removes predictions < threshold
     :return ``List[[numpy_array]]``, list of images
     """
     image_list = []
@@ -110,6 +112,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 try:
                     font = ImageFont.truetype(cfg.PATH_TO_FONT, cfg.FONT_SIZE)
                 except IOError:
+                    logger.exception('Font error')
                     font = ImageFont.load_default()
 
                 text_size = draw.textsize(caption, font)
@@ -140,6 +143,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                     x_center = int(m["m10"] / m["m00"])
                     y_center = int(m["m01"] / m["m00"])
                 except ZeroDivisionError:
+                    logger.exception('Center is zero')
                     continue
                 else:
                     cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)

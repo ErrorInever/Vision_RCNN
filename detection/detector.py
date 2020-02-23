@@ -3,7 +3,7 @@ import os
 from detection import utils
 import math
 import cv2
-import numpy as np
+import logging
 from datetime import datetime
 import visualize
 from data.dataset import Images, Video
@@ -13,13 +13,16 @@ from data.cls import Detect
 from visualize import display_objects
 from config.cfg import cfg
 
+logger = logging.getLogger(__name__)
+
 
 def execution_time(func):
     """Print wasted time of function"""
     def wrapped(*args, **kwargs):
         start_time = datetime.now()
         res = func(*args, **kwargs)
-        print('wasted time = {}'.format((datetime.now() - start_time).total_seconds()))
+        logger.info('call %s with args %s %s time %s', func.__name__, *args, **kwargs,
+                    (datetime.now() - start_time).total_seconds())
         return res
     return wrapped
 
@@ -54,12 +57,12 @@ class Detector(Detect):
 
             with torch.no_grad():
                 predictions = self.model(images)
+                predictions = utils.filter_prediction(predictions, cfg.SCORE_THRESHOLD)
 
             images = display_objects(images, predictions, self.cls_names, self.colors,
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
-                                     display_caption=display_caption,
-                                     score_threshold=cfg.SCORE_THRESHOLD)
+                                     display_caption=display_caption)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
@@ -76,7 +79,6 @@ class Detector(Detect):
         :param flip: if true - flip video
         :param data_path: path to video
         :param out_path: path to output result
-        :param threshold: threshold detection
         """
         video = Video(data_path, out_path, flip)
         # FIXME: num_workers makes infinity loop
@@ -92,10 +94,9 @@ class Detector(Detect):
             images = display_objects(images, predictions, self.cls_names, self.colors,
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
-                                     display_caption=display_caption,
-                                     score_threshold=cfg.SCORE_THRESHOLD)
-
+                                     display_caption=display_caption)
+            # TODO: fix color draw
             for i, img in enumerate(images):
-                video.out.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+                video.out.write(img)
         video.out.release()
         print('Done. Detect on video saves to {}'.format(video.save_path))
