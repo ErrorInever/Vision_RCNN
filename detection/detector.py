@@ -21,8 +21,7 @@ def execution_time(func):
     def wrapped(*args, **kwargs):
         start_time = datetime.now()
         res = func(*args, **kwargs)
-        logger.info('call %s with args %s %s time %s', func.__name__, *args, **kwargs)
-        logger.info('time wasted %s', (datetime.now() - start_time).total_seconds())
+        logger.info('%s time wasted %s', (func.__name__, (datetime.now() - start_time).total_seconds()))
         return res
     return wrapped
 
