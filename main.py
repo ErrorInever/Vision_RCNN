@@ -28,20 +28,21 @@ def parse_args():
 
 if __name__ == '__main__':
     logger = logging.getLogger()
-    c_handler = logging.FileHandler('logs/inference_logs.log', mode='w')
-    #f_handler = logging.FileHandler('logs/error_logs.log', mode='w')
+
+    c_handler = logging.StreamHandler()
+    f_handler = logging.FileHandler('logs/rcnn_errors.log', mode='w', encoding='utf-8')
 
     c_handler.setLevel(logging.INFO)
-    #f_handler.setLevel(logging.ERROR)
+    f_handler.setLevel(logging.ERROR)
     c_format = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
-    #f_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    f_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     c_handler.setFormatter(c_format)
-    #f_handler.setFormatter(f_format)
+    f_handler.setFormatter(f_format)
 
     logger.addHandler(c_handler)
-    #logger.addHandler(f_handler)
+    logger.addHandler(f_handler)
 
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     args = parse_args()
 
