@@ -71,6 +71,7 @@ class Video(IterableDataset):
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 frame = self.img_to_tensor(frame)
                 if self.flip:
                     frame = utils.flip_vert_tensor(frame)

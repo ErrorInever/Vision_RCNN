@@ -84,7 +84,7 @@ class Detector(Detect):
         dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, collate_fn=utils.collate_fn)
 
         for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
-            images = [frame.to(self.device) for frame in batch]
+            images = list(frame.to(self.device) for frame in batch)
 
             with torch.no_grad():
                 predictions = self.model(images)
@@ -94,8 +94,8 @@ class Detector(Detect):
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
                                      display_caption=display_caption)
-            # TODO: fix color draw
-            for i, img in enumerate(images):
-                video.out.write(img)
+
+            for img in images:
+                video.out.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
         video.out.release()
         print('Done. Detect on video saves to {}'.format(video.save_path))

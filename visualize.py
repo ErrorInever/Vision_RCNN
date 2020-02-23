@@ -68,7 +68,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                     display_masks, display_caption):
     """
     Display objects on images
-    :param images: ``List[[Tensor]]``, list of images
+    :param images: ``List[[Tensor]]``, list of images (B,G,R)
     :param predictions:
     ``List[Dict[Tensor]]``, one for each input image. The fields of the ``Dict`` are as
     follows:
