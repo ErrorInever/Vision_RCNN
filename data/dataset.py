@@ -71,7 +71,7 @@ class Video(IterableDataset):
             if ret:
                 if cv2.waitKey(1) % 0xFF == ord('q'):
                     break
-                frame = utils.img_to_tensor(frame)
+                frame = self.img_to_tensor(frame)
                 if self.flip:
                     frame = utils.flip_vert_tensor(frame)
                 yield frame
@@ -83,6 +83,11 @@ class Video(IterableDataset):
     def __iter__(self):
         """:return: iterator of video stream"""
         return self.get_frame
+
+    @property
+    def img_to_tensor(self):
+        """Convert image to tensor"""
+        return transforms.Compose([transforms.ToTensor()])
 
     def __str__(self):
         info = 'duration: {}\nframes: {}\nresolution: {}x{}\nfps: {}'.format(round(self.duration, 1),
