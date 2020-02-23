@@ -1,11 +1,11 @@
 import torch
 import os
-from detection import utils
 import math
 import cv2
 import logging
-from datetime import datetime
 import visualize
+from datetime import datetime
+from detection import utils
 from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
