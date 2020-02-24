@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('--show_boxes', dest='show_boxes', help='Display bounding boxes', action='store_true')
     parser.add_argument('--show_masks', dest='show_masks', help='Display masks', action='store_true')
     parser.add_argument('--show_caption', dest='show_caption', help='Display caption', action='store_true')
+    parser.add_argument('--show_contours', dest='show_contours', help='Display contour mask', action='store_true')
     parser.add_argument('--flip_video', dest='flip', help='Flip video', action='store_true')
     parser.add_argument('--use_gpu', dest='use_gpu', help='Whether use GPU', action='store_true')
     parser.print_help()
@@ -43,7 +44,6 @@ if __name__ == '__main__':
     args = parse_args()
 
     logger.info('Mask RCNN start {}'.format(time.ctime()))
-    logger.info('Config params:{}'.format(cfg.__dict__))
     logger.info('Called with args: {}'.format(args.__dict__))
 
     if not os.path.exists(args.outdir):
@@ -68,11 +68,14 @@ if __name__ == '__main__':
         cfg.DISPLAY_MASKS = True
     if args.show_caption:
         cfg.DISPLAY_CAPTION = True
-    if 1 not in {cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION}:
-        logger.error('Nothing shows: show_boxes=%s, show_masks=%s, show_caption=%s',
-                     cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION)
+    if args.show_contours:
+        cfg.DISPLAY_CONTOURS = True
+    if 1 not in {cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION, cfg.DISPLAY_CONTOURS}:
+        logger.error('Nothing shows: show_boxes=%s, show_masks=%s, show_caption=%s, show_contours=%s',
+                     cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION, cfg.DISPLAY_CONTOURS)
         raise IOError
 
+    logger.info('Config params:{}'.format(cfg.__dict__))
     logger.info('Using device %s', device)
 
     logger.info('Set up model')
@@ -83,7 +86,7 @@ if __name__ == '__main__':
 
     if args.images:
         detector.detect_on_images(args.images, args.outdir, cfg.DISPLAY_MASKS, cfg.DISPLAY_BOUNDING_BOXES,
-                                  cfg.DISPLAY_CAPTION)
+                                  cfg.DISPLAY_CAPTION, cfg.DISPLAY_CONTOURS)
     elif args.video:
         detector.detect_on_video(args.video, args.outdir, cfg.DISPLAY_MASKS, cfg.DISPLAY_BOUNDING_BOXES,
-                                 cfg.DISPLAY_CAPTION, flip=args.flip)
+                                 cfg.DISPLAY_CAPTION, cfg.DISPLAY_CONTOURS, flip=args.flip)

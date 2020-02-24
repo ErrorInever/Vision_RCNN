@@ -4,10 +4,12 @@ __C = edict()
 # for consumers
 cfg = __C
 
-# detection
+# displaying
 __C.DISPLAY_BOUNDING_BOXES = False
 __C.DISPLAY_MASKS = False
 __C.DISPLAY_CAPTION = False
+__C.DISPLAY_CONTOURS = False
+__C.DISPLAY_CENTER_OBJECT = False
 
 # data params
 __C.BATCH_SIZE = 10

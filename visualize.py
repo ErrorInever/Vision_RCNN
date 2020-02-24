@@ -82,22 +82,37 @@ def draw_contours(image, mask, color):
     return contours
 
 
-def draw_center_object(image, contours):
+def get_center(mask):
     """
-    Draw point in the center of object
-    :param image: ``Numpy array [H, W, 3]``
-    :param contours: ``list`` list of contours
+    Finds center of object
+    :param mask: ``Numpy array[H, W]``
+    :return: if contours do not intersect return (x, y) coords of center object else (None, None)
     """
+    _, rough_mask = cv2.threshold(mask.squeeze(0) * 255, thresh=cfg.MASK_ROUGH_THRESHOLD,
+                                  maxval=cfg.MASK_ROUGH_MAXVAL, type=cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(rough_mask.astype(np.uint8),
+                                           mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
     m = cv2.moments(contours[0])
+
     try:
         x_center = int(m["m10"] / m["m00"])
         y_center = int(m["m01"] / m["m00"])
     except ZeroDivisionError:
-        return
+        return None, None
     else:
-        cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
-        cv2.putText(image, "center", (x_center - 20, y_center - 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+        return x_center, y_center
+
+
+def draw_center_object(image, x_center, y_center):
+    """
+    Draws circle in the center of object
+    :param x_center: x coord of center
+    :param y_center: y coord of center
+    :param image: ``Numpy array [H, W, 3]``
+    """
+    cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
+    cv2.putText(image, "center", (x_center - 20, y_center - 20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes,
@@ -121,6 +136,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_boxes: if True: displays bounding boxes on images
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
+    :param display_contours: if True - displays contours around mask on image
     :return ``List[[numpy_array]]``, list of images
     """
     image_list = []
@@ -157,24 +173,22 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                                fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
-        image = np.array(image, dtype=np.uint8)
-        if (masks is not None) and display_masks and display_contours:
+        if 1 in {display_masks, display_contours, cfg.DISPLAY_CENTER_OBJECT}:
             num_masks = masks.shape[0]
-            for i in range(num_masks):
-                mask = masks[i, ...]
-                cls_id = labels[i]
-                apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
-                # draw contours around mask
-                contours = draw_contours(image, mask, colors[cls_id])
-                # draw center of contour
-                draw_center_object(image, contours)
 
-        elif display_contours:
-            num_masks = masks.shape[0]
             for i in range(num_masks):
-                mask = masks[i, ...]
                 cls_id = labels[i]
-                draw_contours(image, mask, colors[cls_id])
+                mask = masks[i, ...]
+                if display_masks:
+                    apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
+
+                if display_contours:
+                    draw_contours(image, mask, colors[cls_id])
+
+                if cfg.DISPLAY_CENTER_OBJECT:
+                    x_center, y_center = get_center(mask)
+                    if (x_center and y_center) is not None:
+                        draw_center_object(image, x_center, y_center)
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)

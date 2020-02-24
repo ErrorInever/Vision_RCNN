@@ -38,12 +38,13 @@ class Detector(Detect):
         super().__init__(model, device)
 
     @execution_time
-    def detect_on_images(self, img_path, out_path, display_masks, display_boxes, display_caption):
+    def detect_on_images(self, img_path, out_path, display_masks, display_boxes, display_caption, display_contours):
         """
         Detects objects on images and saves it
-        :param display_caption: if true - displays caption on image
-        :param display_boxes: if true - displays boxes on image
-        :param display_masks: if true - displays masks on image
+        :param display_caption: if True - displays caption on image
+        :param display_boxes: if True - displays boxes on image
+        :param display_masks: if True - displays masks on image
+        :param display_contours: if True - displays contours around mask on image
         :param img_path: path to images data
         :param out_path: path to output results
         """
@@ -62,20 +63,21 @@ class Detector(Detect):
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
                                      display_caption=display_caption,
-                                     display_contours=True)
+                                     display_contours=display_contours)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
     @execution_time
-    def detect_on_video(self, data_path, out_path, display_masks, display_boxes, display_caption,
+    def detect_on_video(self, data_path, out_path, display_masks, display_boxes, display_caption, display_contours,
                         flip=False):
         """
         Detects objects on video and saves it
         :param display_caption: if true - displays caption on video
         :param display_boxes: if true - displays boxes on video
         :param display_masks: if true - displays masks on video
+        :param display_contours: if true - displays contours around mask on image
         :param flip: if true - flip video
         :param data_path: path to video
         :param out_path: path to output result
@@ -95,7 +97,7 @@ class Detector(Detect):
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
                                      display_caption=display_caption,
-                                     display_contours=True)
+                                     display_contours=display_contours)
 
             for img in images:
                 video.out.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
