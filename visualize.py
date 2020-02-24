@@ -174,6 +174,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
         if 1 in {display_masks, display_contours, cfg.DISPLAY_CENTER_OBJECT}:
+            image = np.array(image, dtype=np.uint8)
             num_masks = masks.shape[0]
 
             for i in range(num_masks):
