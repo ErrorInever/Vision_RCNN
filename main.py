@@ -27,7 +27,7 @@ if __name__ == '__main__':
     logger = logging.getLogger()
 
     c_handler = logging.StreamHandler()
-    f_handler = logging.FileHandler('logs/rcnn_errors.log', mode='w', encoding='utf-8')
+    f_handler = logging.FileHandler(cfg.PATH_TO_LOG_FILE, mode='w', encoding='utf-8')
 
     c_handler.setLevel(logging.INFO)
     f_handler.setLevel(logging.ERROR)
