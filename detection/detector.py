@@ -62,8 +62,7 @@ class Detector(Detect):
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
                                      display_caption=display_caption,
-                                     display_contours=True
-                                     )
+                                     display_contours=True)
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
@@ -95,7 +94,8 @@ class Detector(Detect):
             images = display_objects(images, predictions, self.cls_names, self.colors,
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
-                                     display_caption=display_caption)
+                                     display_caption=display_caption,
+                                     display_contours=True)
 
             for img in images:
                 video.out.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
