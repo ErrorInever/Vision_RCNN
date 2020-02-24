@@ -38,7 +38,7 @@ class Detector(Detect):
         super().__init__(model, device)
 
     @execution_time
-    def detect_on_images(self, img_path, out_path, display_masks=True, display_boxes=True, display_caption=True):
+    def detect_on_images(self, img_path, out_path, display_masks, display_boxes, display_caption):
         """
         Detects objects on images and saves it
         :param display_caption: if true - displays caption on image
@@ -68,7 +68,7 @@ class Detector(Detect):
                 cv2.imwrite(save_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
     @execution_time
-    def detect_on_video(self, data_path, out_path, display_masks=True, display_boxes=True, display_caption=True,
+    def detect_on_video(self, data_path, out_path, display_masks, display_boxes, display_caption,
                         flip=False):
         """
         Detects objects on video and saves it

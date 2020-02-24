@@ -10,18 +10,14 @@ from config.cfg import cfg
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Faster-RCNN')
-    parser.add_argument('--images', dest='images', help='Path to directory where images stored',
-                        default=None, type=str)
-    parser.add_argument('--video', dest='video', help='path to directory where video stored',
-                        default=None, type=str)
-    parser.add_argument('--outdir', dest='outdir',
-                        help='directory to save results, default save to /output',
-                        default='output', type=str)
-    parser.add_argument('--flip_video', dest='flip', help='flip video. Warning: expensive operation',
-                        action='store_true')
-    parser.add_argument('--use_gpu', dest='use_gpu',
-                        help='whether use GPU, if the GPU is unavailable then the CPU will be used',
-                        action='store_true')
+    parser.add_argument('--images', dest='images', help='Path to directory where images stored', default=None, type=str)
+    parser.add_argument('--video', dest='video', help='Path to directory where video stored', default=None, type=str)
+    parser.add_argument('--outdir', dest='outdir', help='Directory to save results', default='output', type=str)
+    parser.add_argument('--show_boxes', dest='show_boxes', help='Display bounding boxes', action='store_true')
+    parser.add_argument('--show_masks', dest='show_masks', help='Display masks', action='store_true')
+    parser.add_argument('--show_caption', dest='show_caption', help='Display caption', action='store_true')
+    parser.add_argument('--flip_video', dest='flip', help='Flip video', action='store_true')
+    parser.add_argument('--use_gpu', dest='use_gpu', help='Whether use GPU', action='store_true')
     parser.print_help()
     return parser.parse_args()
 
@@ -66,6 +62,17 @@ if __name__ == '__main__':
     else:
         device = torch.device('cpu')
 
+    if args.show_boxes:
+        cfg.DISPLAY_BOUNDING_BOXES = True
+    if args.show_masks:
+        cfg.DISPLAY_MASKS = True
+    if args.show_caption:
+        cfg.DISPLAY_CAPTION = True
+    if 1 not in {cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION}:
+        logger.error('Nothing shows: show_boxes=%s, show_masks=%s, show_caption=%s',
+                     cfg.DISPLAY_BOUNDING_BOXES, cfg.DISPLAY_MASKS, cfg.DISPLAY_CAPTION)
+        raise IOError
+
     logger.info('Using device %s', device)
 
     logger.info('Set up model')
@@ -75,8 +82,8 @@ if __name__ == '__main__':
     detector = Detector(model, device)
 
     if args.images:
-        detector.detect_on_images(args.images, args.outdir)
+        detector.detect_on_images(args.images, args.outdir, cfg.DISPLAY_MASKS, cfg.DISPLAY_BOUNDING_BOXES,
+                                  cfg.DISPLAY_CAPTION)
     elif args.video:
-        detector.detect_on_video(args.video, args.outdir, flip=args.flip)
-    else:
-        raise RuntimeError('Something went wrong...')
+        detector.detect_on_video(args.video, args.outdir, cfg.DISPLAY_MASKS, cfg.DISPLAY_BOUNDING_BOXES,
+                                 cfg.DISPLAY_CAPTION, flip=args.flip)

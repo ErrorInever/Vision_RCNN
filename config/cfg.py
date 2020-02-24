@@ -4,6 +4,11 @@ __C = edict()
 # for consumers
 cfg = __C
 
+# detection
+__C.DISPLAY_BOUNDING_BOXES = False
+__C.DISPLAY_MASKS = False
+__C.DISPLAY_CAPTION = False
+
 # data params
 __C.BATCH_SIZE = 10
 __C.NUM_WORKERS = 4
@@ -24,6 +29,6 @@ __C.HEIGHT_TEXT_BBOX = 1
 __C.WIDTH_TEXT_BBOX = 4
 
 # fonts params
-__C.PATH_TO_FONT = 'FasterRCNN_implementation/config/fonts/Ubuntu-B.ttf'
+__C.PATH_TO_FONT = '../config/fonts/Ubuntu-B.ttf'
 __C.FONT_SIZE = 14
 __C.FONT_COLOR = (0, 0, 0)
