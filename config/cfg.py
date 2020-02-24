@@ -34,3 +34,6 @@ __C.WIDTH_TEXT_BBOX = 4
 __C.PATH_TO_FONT = 'Vision_RCNN/config/fonts/Ubuntu-B.ttf'
 __C.FONT_SIZE = 14
 __C.FONT_COLOR = (0, 0, 0)
+
+# logs
+__C.PATH_TO_LOG_FILE = 'Vision_RCNN/logs/rcnn_errors.log'
