@@ -63,6 +63,43 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     return image
 
 
+def draw_contours(image, mask, color):
+    """
+    Draws contours around mask
+    :param image: ``Numpy array [H, W, 3]``
+    :param mask: ``Numpy array[H, W]``
+    :param color: ``Tuple(R,G,B)``, list of colors format RGB
+    :return: ``list`` list of contours
+    """
+    color_contour = tuple(map(int, color))
+    _, rough_mask = cv2.threshold(mask.squeeze(0) * 255, thresh=cfg.MASK_ROUGH_THRESHOLD,
+                                  maxval=cfg.MASK_ROUGH_MAXVAL, type=cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(rough_mask.astype(np.uint8),
+                                           mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
+    cv2.drawContours(image, contours, contourIdx=0, color=color_contour,
+                     thickness=cfg.MASK_CONTOUR_THICKNESS)
+
+    return contours
+
+
+def draw_center_object(image, contours):
+    """
+    Draw point in the center of object
+    :param image: ``Numpy array [H, W, 3]``
+    :param contours: ``list`` list of contours
+    """
+    m = cv2.moments(contours[0])
+    try:
+        x_center = int(m["m10"] / m["m00"])
+        y_center = int(m["m01"] / m["m00"])
+    except ZeroDivisionError:
+        return
+    else:
+        cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
+        cv2.putText(image, "center", (x_center - 20, y_center - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+
+
 def display_objects(images, predictions, cls_names, colors, display_boxes,
                     display_masks, display_caption):
     """
@@ -126,27 +163,11 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
             for i in range(num_masks):
                 mask = masks[i, ...]
                 cls_id = labels[i]
-                color_contour = tuple(map(int, colors[cls_id]))
                 apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
                 # draw contours around mask
-                _, rough_mask = cv2.threshold(mask.squeeze(0) * 255, thresh=cfg.MASK_ROUGH_THRESHOLD,
-                                              maxval=cfg.MASK_ROUGH_MAXVAL, type=cv2.THRESH_BINARY)
-                contours, hierarchy = cv2.findContours(rough_mask.astype(np.uint8),
-                                                       mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
-                cv2.drawContours(image, contours, contourIdx=0, color=color_contour,
-                                 thickness=cfg.MASK_CONTOUR_THICKNESS)
-
+                contours = draw_contours(image, mask, colors[cls_id])
                 # draw center of contour
-                m = cv2.moments(contours[0])
-                try:
-                    x_center = int(m["m10"] / m["m00"])
-                    y_center = int(m["m01"] / m["m00"])
-                except ZeroDivisionError:
-                    continue
-                else:
-                    cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)
-                    cv2.putText(image, "center", (x_center - 20, y_center - 20),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                draw_center_object(image, contours)
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)
