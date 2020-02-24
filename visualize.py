@@ -101,7 +101,7 @@ def draw_center_object(image, contours):
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption):
+                    display_masks, display_caption, display_contours):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images (B,G,R)
@@ -157,9 +157,9 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                                fill=colors[cls_id])
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
-        if display_masks and (masks is not None):
+        image = np.array(image, dtype=np.uint8)
+        if (masks is not None) and display_masks and display_contours:
             num_masks = masks.shape[0]
-            image = np.array(image, dtype=np.uint8)
             for i in range(num_masks):
                 mask = masks[i, ...]
                 cls_id = labels[i]
@@ -168,6 +168,13 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 contours = draw_contours(image, mask, colors[cls_id])
                 # draw center of contour
                 draw_center_object(image, contours)
+
+        elif display_contours:
+            num_masks = masks.shape[0]
+            for i in range(num_masks):
+                mask = masks[i, ...]
+                cls_id = labels[i]
+                draw_contours(image, mask, colors[cls_id])
 
         if not isinstance(image, np.ndarray):
             image = np.array(image)

@@ -61,7 +61,9 @@ class Detector(Detect):
             images = display_objects(images, predictions, self.cls_names, self.colors,
                                      display_masks=display_masks,
                                      display_boxes=display_boxes,
-                                     display_caption=display_caption)
+                                     display_caption=display_caption,
+                                     display_contours=True
+                                     )
 
             for i, img in enumerate(images):
                 save_path = os.path.join(out_path, 'detection_{}.png'.format(i))
