@@ -9,7 +9,7 @@ from config.cfg import cfg
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Faster-RCNN')
+    parser = argparse.ArgumentParser(description='Vision-RCNN')
     parser.add_argument('--images', dest='images', help='Path to directory where images stored', default=None, type=str)
     parser.add_argument('--video', dest='video', help='Path to directory where video stored', default=None, type=str)
     parser.add_argument('--outdir', dest='outdir', help='Directory to save results', default='output', type=str)
