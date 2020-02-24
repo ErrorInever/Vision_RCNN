@@ -63,7 +63,6 @@ def apply_mask(image, mask, color, threshold=0.5, alpha=0.5):
     return image
 
 
-# TODO: video inference, draws overlap, iou, layers of net
 def display_objects(images, predictions, cls_names, colors, display_boxes,
                     display_masks, display_caption):
     """
@@ -143,7 +142,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                     x_center = int(m["m10"] / m["m00"])
                     y_center = int(m["m01"] / m["m00"])
                 except ZeroDivisionError:
-                    logger.exception('Center is zero')
                     continue
                 else:
                     cv2.circle(image, (x_center, y_center), radius=5, color=(0, 0, 0), thickness=-1)

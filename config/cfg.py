@@ -29,6 +29,6 @@ __C.HEIGHT_TEXT_BBOX = 1
 __C.WIDTH_TEXT_BBOX = 4
 
 # fonts params
-__C.PATH_TO_FONT = '../config/fonts/Ubuntu-B.ttf'
+__C.PATH_TO_FONT = 'Vision_RCNN/config/fonts/Ubuntu-B.ttf'
 __C.FONT_SIZE = 14
 __C.FONT_COLOR = (0, 0, 0)
