@@ -51,7 +51,7 @@ class Detector(Detect):
         img_dataset = Images(img_path)
         dataloader = DataLoader(img_dataset, batch_size=cfg.BATCH_SIZE, num_workers=cfg.NUM_WORKERS, shuffle=False,
                                 collate_fn=utils.collate_fn)
-
+        logger.info('Start detecting')
         for images in tqdm(dataloader):
             images = list(image.to(self.device) for image in images)
 
@@ -83,9 +83,11 @@ class Detector(Detect):
         :param out_path: path to output result
         """
         video = Video(data_path, out_path, flip)
+        logger.info('Video info: %s', video)
+        logger.info('Processing video')
         # FIXME: num_workers makes infinity loop
         dataloader = DataLoader(video, batch_size=cfg.BATCH_SIZE, collate_fn=utils.collate_fn)
-
+        logger.info('Start detecting')
         for batch in tqdm(dataloader, total=(math.ceil(len(dataloader) / cfg.BATCH_SIZE))):
             images = list(frame.to(self.device) for frame in batch)
 
