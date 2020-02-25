@@ -15,11 +15,12 @@ class Images(Dataset):
     """Image dataset"""
     def __init__(self, img_path):
         """:param img_path: path to images directory"""
+        if not os.path.isdir(img_path):
+            logger.error('Directory not found %s', img_path)
+            raise IsADirectoryError
+
         self.img_path = img_path
-        try:
-            self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
-        except FileNotFoundError as e:
-            logger.exception('File not found')
+        self.img_names = [n for n in os.listdir(img_path) if n.endswith(('jpg', 'jpeg', 'png'))]
 
     def __getitem__(self, idx):
         """
@@ -49,6 +50,10 @@ class Video(IterableDataset):
         :param save_path: path to output directory
         :param flip: if true - flip video. Warning: it is expensive operation.
         """
+        if not os.path.isfile(video_path):
+            logger.error('File not found %s', video_path)
+            raise FileExistsError
+
         self.cap = cv2.VideoCapture(video_path)
         self.video_path = video_path
         self.save_path = os.path.join(save_path, 'detection_{}.avi'.format(
