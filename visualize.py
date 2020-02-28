@@ -116,7 +116,7 @@ def draw_center_object(image, x_center, y_center):
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, display_contours, display_only_mask=True):
+                    display_masks, display_caption, display_contours, remove_background=False):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images (B,G,R)
@@ -150,16 +150,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
 
-        if display_only_mask:
-            height, width, channels = image.shape
-            image = np.zeros((height, width, channels), np.uint8)
-            for i in range(masks.shape[0]):
-                cls_id = labels[i]
-                mask = masks[i, ...]
-                apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
-            image_list.append(image)
-            continue
-
         for i in range(num_boxes):
             cls_id = labels[i]
             x1, y1, x2, y2 = boxes[i]
@@ -185,9 +175,13 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
         if 1 in {display_masks, display_contours, cfg.DISPLAY_CENTER_OBJECT}:
-            image = np.array(image, dtype=np.uint8)
-            num_masks = masks.shape[0]
+            if remove_background:
+                height, width, channels = image.shape
+                image = np.zeros((height, width, channels), np.uint8)
+            else:
+                image = np.array(image, dtype=np.uint8)
 
+            num_masks = masks.shape[0]
             for i in range(num_masks):
                 cls_id = labels[i]
                 mask = masks[i, ...]
