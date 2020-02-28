@@ -137,6 +137,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
     :param display_contours: if True - displays contours around mask on image
+    :param remove_background: if True - replace background from image
     :return ``List[[numpy_array]]``, list of images
     """
     image_list = []
