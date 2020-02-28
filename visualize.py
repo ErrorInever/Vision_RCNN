@@ -143,14 +143,21 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     image_list = []
 
     for k, prediction in enumerate(predictions):
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
         boxes = prediction['boxes'].cpu()
         masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
+
+        if remove_background:
+            image = np.array(images[k], dtype=np.uint8)
+            height, width, channels = image.shape
+            image = np.zeros((height, width, channels), np.uint8)
+        else:
+            image = images[k]
+
+        image = Image.fromarray(utils.reverse_normalization(image))
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
-
         for i in range(num_boxes):
             cls_id = labels[i]
             x1, y1, x2, y2 = boxes[i]
@@ -176,12 +183,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
                 draw.text((x1 + 2, y1 - text_size[1]), caption, font=font, fill=(0, 0, 0))
 
         if 1 in {display_masks, display_contours, cfg.DISPLAY_CENTER_OBJECT}:
-            if remove_background:
-                height, width, channels = image.shape
-                image = np.zeros((height, width, channels), np.uint8)
-            else:
-                image = np.array(image, dtype=np.uint8)
-
+            image = np.array(image, dtype=np.uint8)
             num_masks = masks.shape[0]
             for i in range(num_masks):
                 cls_id = labels[i]
