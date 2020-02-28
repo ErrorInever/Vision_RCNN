@@ -51,6 +51,6 @@ Project for own visualization of like-rcnn nets.
         If True - remove background on image
         __C.REMOVE_BACKGROUND = False
         
-        
 ![alt text](https://raw.githubusercontent.com/ErrorInever/Vision_RCNN/master/images/3-mALOBsyIY.jpg)
 ![alt text](https://raw.githubusercontent.com/ErrorInever/Vision_RCNN/master/images/ziVb5vyrfLU.jpg)
+![alt text](https://raw.githubusercontent.com/ErrorInever/Vision_RCNN/master/images/8cb829b5-b60f-4a5f-93ab-b0d4ca6054b6.png)
