@@ -116,7 +116,7 @@ def draw_center_object(image, x_center, y_center):
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, display_contours):
+                    display_masks, display_caption, display_contours, display_only_mask=True):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images (B,G,R)
@@ -149,6 +149,17 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
         scores = prediction['scores'].cpu().detach().numpy()
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
+
+        if display_only_mask:
+            height, width, channels = image.shape
+            image = np.zeros((height, width, channels), np.uint8)
+            for i in range(masks.shape[0]):
+                cls_id = labels[i]
+                mask = masks[i, ...]
+                apply_mask(image, mask, colors[cls_id], threshold=cfg.MASK_THRESHOLD, alpha=cfg.MASK_ALPHA)
+            image_list.append(image)
+            continue
+
         for i in range(num_boxes):
             cls_id = labels[i]
             x1, y1, x2, y2 = boxes[i]
