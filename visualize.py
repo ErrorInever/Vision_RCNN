@@ -149,13 +149,12 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
         scores = prediction['scores'].cpu().detach().numpy()
 
         if remove_background:
-            image = np.array(images[k], dtype=np.uint8)
-            height, width, channels = image.shape
+            height, width, channels = images[k].permute(1, 2, 0).shape
             image = np.zeros((height, width, channels), np.uint8)
+            image = Image.fromarray(image)
         else:
-            image = images[k]
+            image = Image.fromarray(utils.reverse_normalization(images[k]))
 
-        image = Image.fromarray(utils.reverse_normalization(image))
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
         for i in range(num_boxes):
