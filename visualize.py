@@ -116,7 +116,7 @@ def draw_center_object(image, x_center, y_center):
 
 
 def display_objects(images, predictions, cls_names, colors, display_boxes,
-                    display_masks, display_caption, display_contours, remove_background=False):
+                    display_masks, display_caption, display_contours):
     """
     Display objects on images
     :param images: ``List[[Tensor]]``, list of images (B,G,R)
@@ -137,7 +137,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     :param display_masks: if True: displays masks on images
     :param display_caption: if True: displays caption on images
     :param display_contours: if True - displays contours around mask on image
-    :param remove_background: if True - replace background from image
     :return ``List[[numpy_array]]``, list of images
     """
     image_list = []
@@ -148,7 +147,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
 
-        if remove_background:
+        if cfg.REMOVE_BACKGROUND:
             height, width, channels = images[k].permute(1, 2, 0).shape
             image = np.zeros((height, width, channels), np.uint8)
             image = Image.fromarray(image)
