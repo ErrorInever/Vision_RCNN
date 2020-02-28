@@ -47,6 +47,9 @@ Project for own visualization of like-rcnn nets.
         
         If True - displaying center of objects
         __C.DISPLAY_CENTER_OBJECT = False
+
+        If True - remove background on image
+        __C.REMOVE_BACKGROUND = False
         
         
 ![alt text](https://raw.githubusercontent.com/ErrorInever/Vision_RCNN/master/images/3-mALOBsyIY.jpg)

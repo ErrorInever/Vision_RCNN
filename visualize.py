@@ -142,11 +142,18 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     image_list = []
 
     for k, prediction in enumerate(predictions):
-        image = Image.fromarray(utils.reverse_normalization(images[k]))
         boxes = prediction['boxes'].cpu()
         masks = prediction['masks'].cpu().numpy() if 'masks' in prediction else None
         labels = prediction['labels'].cpu().detach().numpy()
         scores = prediction['scores'].cpu().detach().numpy()
+
+        if cfg.REMOVE_BACKGROUND:
+            height, width, channels = images[k].permute(1, 2, 0).shape
+            image = np.zeros((height, width, channels), np.uint8)
+            image = Image.fromarray(image)
+        else:
+            image = Image.fromarray(utils.reverse_normalization(images[k]))
+
         draw = ImageDraw.Draw(image)
         num_boxes = boxes.shape[0]
         for i in range(num_boxes):
@@ -176,7 +183,6 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
         if 1 in {display_masks, display_contours, cfg.DISPLAY_CENTER_OBJECT}:
             image = np.array(image, dtype=np.uint8)
             num_masks = masks.shape[0]
-
             for i in range(num_masks):
                 cls_id = labels[i]
                 mask = masks[i, ...]

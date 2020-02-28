@@ -10,6 +10,8 @@ __C.DISPLAY_MASKS = False
 __C.DISPLAY_CAPTION = False
 __C.DISPLAY_CONTOURS = False
 __C.DISPLAY_CENTER_OBJECT = False
+# remove background on image
+__C.REMOVE_BACKGROUND = False
 
 # data params
 __C.BATCH_SIZE = 10
