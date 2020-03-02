@@ -12,6 +12,7 @@ from tqdm import tqdm
 from data.cls import Detect
 from visualize import display_objects
 from config.cfg import cfg
+from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,29 @@ class Detector(Detect):
         """
         self.cls_names = utils.class_names()
         self.colors = visualize.assign_colors(self.cls_names)
+        self.activations = {}
         super().__init__(model, device)
+
+    def get_layer(self, name):
+        """
+        Gets layer object
+        :param name: layer name, can be nested
+        :return: ``Torch.nn.Module``
+        """
+        try:
+            return reduce(getattr, name.split('.'), self.model)
+        except AttributeError:
+            logger.error('%s object has no attribute %s', self.model.__class__.__name__, name)
+
+    def get_activations(self, name):
+        """
+        Gets features maps of layer
+        :param name: ``Torch.nn.Module``, layer name
+        :return: ``Dict[layer_name: Tensor]``, Tensor may have a different dimension from different layers
+        """
+        def hook(model, input, output):
+            self.activations[name] = output.detach()
+        return hook
 
     @execution_time
     def detect_on_images(self, img_path, out_path, display_masks, display_boxes, display_caption, display_contours):

@@ -202,3 +202,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
 
         image_list.append(image)
     return image_list
+
+
+def draw_layer(activation, row_ch, col_ch):
+    pass
