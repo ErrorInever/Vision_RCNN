@@ -4,6 +4,7 @@ import logging
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -204,5 +205,20 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     return image_list
 
 
-def draw_layer(activation, row_ch, col_ch):
-    pass
+def draw_features_maps(activations, nrows=3, ncols=2, figsize=(25, 25)):
+    """
+    :param activations: ``Tensor[N, H, W]``
+    :param nrows: ``int``, numbers of rows
+    :param ncols: ``int``, numbers of cols
+    :param figsize: ``tuple``, figsize
+    """
+    for key in activations:
+        act = activations[key].squeeze()
+
+        fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+
+        for i, ax in enumerate(ax.flat):
+            img = act[i]
+            ax.imshow(img, alpha=1, cmap='jet')
+            plt.show()
+            fig.savefig('{}_{}.png'.format(key, i), bbox_inches='tight', pad_inches=0)

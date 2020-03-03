@@ -10,7 +10,7 @@ from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.cls import Detect
-from visualize import display_objects
+from visualize import display_objects, draw_features_maps
 from config.cfg import cfg
 from functools import reduce
 
@@ -29,7 +29,7 @@ def execution_time(func):
 
 class Detector(Detect):
     """object detector"""
-    def __init__(self, model, device):
+    def __init__(self, model, device, maps_on=False):
         """
         :param model: instance of net
         :param device: can be cpu or cuda device
@@ -37,25 +37,24 @@ class Detector(Detect):
         self.cls_names = utils.class_names()
         self.colors = visualize.assign_colors(self.cls_names)
         self.activations = {}
+        self.maps_on = maps_on
+
+        # hook layers
+        if maps_on:
+            # layer ¹1 convolution ¹3 [256, 200, 272]
+            self.model.backbone.body.layer1[2].conv3.register_forward_hook(self.get_activation('first_conv'))
+            # FPN layer_blocks ¹0 [256, 200, 272]
+            self.model.backbone.fpn.layer_blocks[0].register_forward_hook(self.get_activation('fpn'))
+
+            # RPN head convolution
+            #self.model.rpn.head.conv.register_forward_hook(self.get_activation('rpn'))
+            # Roi_heads mask_predictor convolution ¹5
+            #self.model.roi_heads.mask_predictor.conv5_mask.register_forward_hook(self.get_activation('mask_predictor'))
+
         super().__init__(model, device)
 
-    def get_layer(self, name):
-        """
-        Gets layer object
-        :param name: layer name, can be nested
-        :return: ``Torch.nn.Module``
-        """
-        try:
-            return reduce(getattr, name.split('.'), self.model)
-        except AttributeError:
-            logger.error('%s object has no attribute %s', self.model.__class__.__name__, name)
-
-    def get_activations(self, name):
-        """
-        Gets features maps of layer
-        :param name: ``Torch.nn.Module``, layer name
-        :return: ``Dict[layer_name: Tensor]``, Tensor may have a different dimension from different layers
-        """
+    def get_activation(self, name):
+        """Gets feature maps"""
         def hook(model, input, output):
             self.activations[name] = output.detach()
         return hook
@@ -80,6 +79,11 @@ class Detector(Detect):
 
             with torch.no_grad():
                 predictions = self.model(images)
+
+                if self.maps_on:
+                    draw_features_maps(self.activations, nrows=3, ncols=2, figsize=(25, 25))
+                    self.activations = {}
+
                 predictions = utils.filter_prediction(predictions, cfg.SCORE_THRESHOLD)
 
             images = display_objects(images, predictions, self.cls_names, self.colors,
