@@ -10,7 +10,7 @@ from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.cls import Detect
-from visualize import display_objects, draw_features_maps
+from visualize import display_objects, draw_table_activations, draw_activation
 from config.cfg import cfg
 from functools import reduce
 
@@ -34,6 +34,7 @@ class Detector(Detect):
         :param model: instance of net
         :param device: can be cpu or cuda device
         """
+        self.model = model
         self.cls_names = utils.class_names()
         self.colors = visualize.assign_colors(self.cls_names)
         self.activations = {}
@@ -81,8 +82,9 @@ class Detector(Detect):
                 predictions = self.model(images)
 
                 if self.maps_on:
-                    draw_features_maps(self.activations, nrows=3, ncols=2, figsize=(25, 25))
+                    draw_activation(self.activations['fpn'], nchannel=2, outpath=out_path, figsize=(15, 15))
                     self.activations = {}
+                    continue
 
                 predictions = utils.filter_prediction(predictions, cfg.SCORE_THRESHOLD)
 

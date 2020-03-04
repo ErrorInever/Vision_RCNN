@@ -1,10 +1,12 @@
 import numpy as np
 import cv2
+import os
 import logging
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -205,20 +207,40 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     return image_list
 
 
-def draw_features_maps(activations, nrows=3, ncols=2, figsize=(25, 25)):
+def draw_activation(fmap, nchannel, outpath, figsize=(15, 15)):
+    """
+    Draws specified feature map from activation
+    :param fmap: ``Tensor``
+    :param nchannel: ``int`` number of channel
+    :param outpath: path to save
+    :param figsize: ``tuple`` image size
+    :return:
+    """
+    fmap = fmap.squeeze().cpu()
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.imshow(fmap[nchannel], alpha=1, cmap='jet')
+    fig.savefig(os.path.join(outpath, '{}.png'.format(datetime.today().strftime('%H:%M:%S'))),
+                bbox_inches='tight', pad_inches=0)
+
+
+def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 25)):
     """
     :param activations: ``Tensor[N, H, W]``
+    :param outpath: path to save
     :param nrows: ``int``, numbers of rows
     :param ncols: ``int``, numbers of cols
     :param figsize: ``tuple``, figsize
     """
     for key in activations:
-        act = activations[key].squeeze()
-
+        act = activations[key].squeeze().cpu()
         fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
-
         for i, ax in enumerate(ax.flat):
-            img = act[i]
-            ax.imshow(img, alpha=1, cmap='jet')
-            plt.show()
-            fig.savefig('{}_{}.png'.format(key, i), bbox_inches='tight', pad_inches=0)
+            fmap = act[i]
+            try:
+                ax.imshow(fmap, alpha=1, cmap='jet')
+            except TypeError:
+                logger.exception('Invalid shape %s for image data', fmap.shape)
+            else:
+                plt.show()
+                fig.savefig(os.path.join(outpath, '{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S'))),
+                            bbox_inches='tight', pad_inches=0)
