@@ -244,6 +244,8 @@ def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 
             fmap = act[i]
             ax.imshow(fmap, alpha=1, cmap='jet')
             plt.show()
-            fig.savefig(os.path.join(outpath,
-                                     'table_fmap{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S'))),
-                        bbox_inches='tight', pad_inches=0)
+
+        fig.savefig(os.path.join(
+            outpath,
+            'table_fmap{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S'))),
+            bbox_inches='tight', pad_inches=0)
