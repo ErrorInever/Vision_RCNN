@@ -84,7 +84,7 @@ class Detector(Detect):
                 if self.maps_on:
                     if cfg.TABLE_FEATURE_MAP:
                         draw_table_activations(self.activations, out_path, nrows=3, ncols=2, figsize=(15, 15))
-                    else:
+                    elif cfg.CHANNELS_FEATURE_MAP:
                         draw_activation(self.activations['fpn'], start_channel=0, end_channel=1, outpath=out_path,
                                         figsize=(15, 15))
                     self.activations = {}
