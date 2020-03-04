@@ -207,20 +207,26 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
     return image_list
 
 
-def draw_activation(fmap, nchannel, outpath, figsize=(15, 15)):
+def draw_activation(fmap, outpath, start_channel=0, end_channel=1, figsize=(15, 15)):
     """
-    Draws specified feature map from activation
+    Draws specified features maps from activation
     :param fmap: ``Tensor``
-    :param nchannel: ``int`` number of channel
     :param outpath: path to save
+    :param start_channel: from channel
+    :param end_channel: up to channel
     :param figsize: ``tuple`` image size
-    :return:
     """
+    if (start_channel == end_channel) or (start_channel > end_channel):
+        logger.info('Wrong start_chanel or end_channel: start %s , end %s', start_channel, end_channel)
+        return
+
     fmap = fmap.squeeze().cpu()
     fig, ax = plt.subplots(figsize=figsize)
-    ax.imshow(fmap[nchannel], alpha=1, cmap='jet')
-    fig.savefig(os.path.join(outpath, '{}.png'.format(datetime.today().strftime('%H:%M:%S'))),
-                bbox_inches='tight', pad_inches=0)
+
+    for i in range(start_channel, end_channel):
+        ax.imshow(fmap[i], alpha=1, cmap='jet')
+        fig.savefig(os.path.join(outpath, 'fmap_{}_{}.png'.format(i, datetime.today().strftime('%H:%M:%S'))),
+                    bbox_inches='tight', pad_inches=0)
 
 
 def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 25)):
