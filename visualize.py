@@ -248,5 +248,6 @@ def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 
                 logger.exception('Invalid shape %s for image data', fmap.shape)
             else:
                 plt.show()
-                fig.savefig(os.path.join(outpath, '{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S'))),
+                fig.savefig(os.path.join(outpath,
+                                         'table_fmap{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S'))),
                             bbox_inches='tight', pad_inches=0)

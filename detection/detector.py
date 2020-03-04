@@ -29,7 +29,7 @@ def execution_time(func):
 
 class Detector(Detect):
     """object detector"""
-    def __init__(self, model, device, maps_on=False):
+    def __init__(self, model, device):
         """
         :param model: instance of net
         :param device: can be cpu or cuda device
@@ -38,10 +38,10 @@ class Detector(Detect):
         self.cls_names = utils.class_names()
         self.colors = visualize.assign_colors(self.cls_names)
         self.activations = {}
-        self.maps_on = maps_on
+        self.maps_on = cfg.FEATURE_MAP
 
         # hook layers
-        if maps_on:
+        if self.maps_on:
             # layer ¹1 convolution ¹3 [256, 200, 272]
             self.model.backbone.body.layer1[2].conv3.register_forward_hook(self.get_activation('first_conv'))
             # FPN layer_blocks ¹0 [256, 200, 272]
@@ -82,7 +82,11 @@ class Detector(Detect):
                 predictions = self.model(images)
 
                 if self.maps_on:
-                    draw_activation(self.activations['fpn'], nchannel=2, outpath=out_path, figsize=(15, 15))
+                    if cfg.TABLE_FEATURE_MAP:
+                        draw_table_activations(self.activations, out_path, nrows=3, ncols=2, figsize=(15, 15))
+                    else:
+                        draw_activation(self.activations['fpn'], start_channel=0, end_channel=1, outpath=out_path,
+                                        figsize=(15, 15))
                     self.activations = {}
                     continue
 
