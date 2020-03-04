@@ -225,6 +225,7 @@ def draw_activation(fmap, outpath, start_channel=0, end_channel=1, figsize=(15, 
 
     for i in range(start_channel, end_channel):
         ax.imshow(fmap[i], alpha=1, cmap='jet')
+        ax.text(5, 7, 'ch {}:'.format(i), fontsize=14, weight="bold")
         fig.savefig(os.path.join(outpath, 'fmap_{}_{}.png'.format(i, datetime.today().strftime('%H:%M:%S'))),
                     bbox_inches='tight', pad_inches=0)
 
@@ -243,6 +244,7 @@ def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 
         for i, ax in enumerate(ax.flat):
             fmap = act[i]
             ax.imshow(fmap, alpha=1, cmap='jet')
+            ax.text(5, 10, 'ch {}:'.format(i), fontsize=14, weight="bold")
             plt.show()
 
         fig.savefig(os.path.join(
