@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from detection import utils
 import matplotlib.pyplot as plt
 from datetime import datetime
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +217,9 @@ def draw_activation(fmaps, outpath, start_channel=0, end_channel=1, figsize=(15,
     :param end_channel: up to channel
     :param figsize: ``tuple`` image size
     """
+    save_path = os.path.join(outpath, 'activations/feature_maps')
+    Path(save_path).mkdir(parents=True, exist_ok=True)
+
     if (start_channel == end_channel) or (start_channel > end_channel):
         logger.info('Wrong start_chanel or end_channel: start %s , end %s', start_channel, end_channel)
         return
@@ -232,7 +236,7 @@ def draw_activation(fmaps, outpath, start_channel=0, end_channel=1, figsize=(15,
             fig, ax = plt.subplots(figsize=figsize)
             ax.imshow(fmap[j], alpha=1, cmap='jet')
             ax.text(5, 7, 'ch {}:'.format(j), fontsize=14, weight="bold")
-            fig.savefig(os.path.join(outpath, 'fmap_img_{}_ch_{}#{}.png'.format(
+            fig.savefig(os.path.join(save_path, 'fmap_img_{}_ch_{}#{}.png'.format(
                 i, j, datetime.today().strftime('%H:%M:%S.%f'))),
                         bbox_inches='tight', pad_inches=0)
 
@@ -245,6 +249,9 @@ def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 
     :param ncols: ``int``, numbers of cols
     :param figsize: ``tuple``, figsize
     """
+    save_path = os.path.join(outpath, 'activations/tables_maps')
+    Path(save_path).mkdir(parents=True, exist_ok=True)
+
     for key in activations:
         act = activations[key].squeeze().cpu()
 
