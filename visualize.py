@@ -271,5 +271,5 @@ def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 
 
             fig.savefig(os.path.join(
                 save_path,
-                'table_fmap{}_{}.png'.format(key, datetime.today().strftime('%H:%M:%S.%f'))),
+                '{}#{}.png'.format(key, datetime.today().strftime('%H:%M:%S.%f'))),
                 bbox_inches='tight', pad_inches=0)
