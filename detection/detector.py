@@ -10,8 +10,9 @@ from data.dataset import Images, Video
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from data.cls import Detect
-from visualize import display_objects
+from visualize import display_objects, draw_table_activations, draw_activation
 from config.cfg import cfg
+from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +34,31 @@ class Detector(Detect):
         :param model: instance of net
         :param device: can be cpu or cuda device
         """
+        self.model = model
         self.cls_names = utils.class_names()
         self.colors = visualize.assign_colors(self.cls_names)
+        self.activations = {}
+        self.maps_on = cfg.FEATURE_MAP
+
+        # hook layers
+        if self.maps_on:
+            # layer ¹1 convolution ¹3 [256, 200, 272]
+            self.model.backbone.body.layer1[2].conv3.register_forward_hook(self.get_activation('first_conv'))
+            # FPN layer_blocks ¹0 [256, 200, 272]
+            self.model.backbone.fpn.layer_blocks[0].register_forward_hook(self.get_activation('fpn'))
+
+            # RPN head convolution
+            #self.model.rpn.head.conv.register_forward_hook(self.get_activation('rpn'))
+            # Roi_heads mask_predictor convolution ¹5
+            #self.model.roi_heads.mask_predictor.conv5_mask.register_forward_hook(self.get_activation('mask_predictor'))
+
         super().__init__(model, device)
+
+    def get_activation(self, name):
+        """Gets feature maps"""
+        def hook(model, input, output):
+            self.activations[name] = output.detach()
+        return hook
 
     @execution_time
     def detect_on_images(self, img_path, out_path, display_masks, display_boxes, display_caption, display_contours):
@@ -57,6 +80,16 @@ class Detector(Detect):
 
             with torch.no_grad():
                 predictions = self.model(images)
+
+                if self.maps_on:
+                    if cfg.TABLE_FEATURE_MAP:
+                        draw_table_activations(self.activations, out_path, nrows=3, ncols=2, figsize=(15, 15))
+                    if cfg.CHANNELS_FEATURE_MAP:
+                        draw_activation(self.activations['fpn'], start_channel=0, end_channel=1, outpath=out_path,
+                                        figsize=(15, 15))
+                    self.activations = {}
+                    continue
+
                 predictions = utils.filter_prediction(predictions, cfg.SCORE_THRESHOLD)
 
             images = display_objects(images, predictions, self.cls_names, self.colors,

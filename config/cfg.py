@@ -5,6 +5,10 @@ __C = edict()
 cfg = __C
 
 # displaying
+__C.FEATURE_MAP = False
+__C.CHANNELS_FEATURE_MAP = False
+__C.TABLE_FEATURE_MAP = False
+
 __C.DISPLAY_BOUNDING_BOXES = False
 __C.DISPLAY_MASKS = False
 __C.DISPLAY_CAPTION = False

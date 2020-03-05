@@ -1,9 +1,13 @@
 import numpy as np
 import cv2
+import os
 import logging
 from config.cfg import cfg
 from PIL import Image, ImageDraw, ImageFont
 from detection import utils
+import matplotlib.pyplot as plt
+from datetime import datetime
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -202,3 +206,70 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
 
         image_list.append(image)
     return image_list
+
+
+def draw_activation(fmaps, outpath, start_channel=0, end_channel=1, figsize=(15, 15)):
+    """
+    Draws specified features maps from activation
+    :param fmaps: for batch ``Tensor[N, C, H, W]`` else ``Tensor[C, H, W]``
+    :param outpath: path to save
+    :param start_channel: from channel
+    :param end_channel: up to channel
+    :param figsize: ``tuple`` image size
+    """
+    save_path = os.path.join(outpath, 'activations/feature_maps')
+    Path(save_path).mkdir(parents=True, exist_ok=True)
+
+    if (start_channel == end_channel) or (start_channel > end_channel):
+        logger.info('Wrong start_chanel or end_channel: start %s , end %s', start_channel, end_channel)
+        return
+
+    # TODO: if it is not a batch then the dimension will be equal [C, H, W],
+    #  but loop expects batch with dimension [N, C, H, W]
+    # add None dimension to activation
+    if len(fmaps.shape) == 3:
+        fmaps = fmaps[None, ...]
+
+    for i in range(fmaps.shape[0]):
+        fmap = fmaps[i].cpu()
+        for j in range(start_channel, end_channel):
+            fig, ax = plt.subplots(figsize=figsize)
+            ax.imshow(fmap[j], alpha=1, cmap='jet')
+            ax.text(5, 7, 'ch {}:'.format(j), fontsize=14, weight="bold")
+            fig.savefig(os.path.join(save_path, 'fmap_img_{}_ch_{}#{}.png'.format(
+                i, j, datetime.today().strftime('%H:%M:%S.%f'))),
+                        bbox_inches='tight', pad_inches=0)
+
+
+def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 25)):
+    """
+    :param activations: for batch ``Tensor[N, C, H, W]`` else ``Tensor[C, H, W]``
+    :param outpath: path to save
+    :param nrows: ``int``, numbers of rows
+    :param ncols: ``int``, numbers of cols
+    :param figsize: ``tuple``, figsize
+    """
+    save_path = os.path.join(outpath, 'activations/tables_maps')
+    Path(save_path).mkdir(parents=True, exist_ok=True)
+
+    for key in activations:
+        act = activations[key].squeeze().cpu()
+
+        # TODO: if it is not a batch then the dimension will be equal [C, H, W],
+        #  but loop expects batch with dimension [N, C, H, W]
+        # add None dimension to activation
+        if len(act.shape) == 3:
+            act = act[None, ...]
+
+        for i in range(act.shape[0]):
+            fmap = act[i].cpu()
+            fig, ax = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+            for j, ax in enumerate(ax.flat):
+                ax.imshow(fmap[j], alpha=1, cmap='jet')
+                ax.text(5, 10, 'ch {}:'.format(j), fontsize=14, weight="bold")
+                plt.show()
+
+            fig.savefig(os.path.join(
+                save_path,
+                '{}#{}.png'.format(key, datetime.today().strftime('%H:%M:%S.%f'))),
+                bbox_inches='tight', pad_inches=0)
