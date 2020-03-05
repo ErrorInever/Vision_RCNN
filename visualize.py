@@ -210,7 +210,7 @@ def display_objects(images, predictions, cls_names, colors, display_boxes,
 def draw_activation(fmap, outpath, start_channel=0, end_channel=1, figsize=(15, 15)):
     """
     Draws specified features maps from activation
-    :param fmap: ``Tensor``
+    :param fmap: ``Tensor[N, C, H, W]``, activations
     :param outpath: path to save
     :param start_channel: from channel
     :param end_channel: up to channel
@@ -220,19 +220,21 @@ def draw_activation(fmap, outpath, start_channel=0, end_channel=1, figsize=(15, 
         logger.info('Wrong start_chanel or end_channel: start %s , end %s', start_channel, end_channel)
         return
 
-    fmap = fmap.squeeze().cpu()
-    fig, ax = plt.subplots(figsize=figsize)
+    # for each activation of image
+    for i in range(fmap.shape[0]):
+        fmap = fmap[i].squeeze().cpu()
 
-    for i in range(start_channel, end_channel):
-        ax.imshow(fmap[i], alpha=1, cmap='jet')
-        ax.text(5, 7, 'ch {}:'.format(i), fontsize=14, weight="bold")
-        fig.savefig(os.path.join(outpath, 'fmap_{}_{}.png'.format(i, datetime.today().strftime('%H:%M:%S'))),
-                    bbox_inches='tight', pad_inches=0)
+        fig, ax = plt.subplots(figsize=figsize)
+        for j in range(start_channel, end_channel):
+            ax.imshow(fmap[i], alpha=1, cmap='jet')
+            ax.text(5, 7, 'ch {}:'.format(j), fontsize=14, weight="bold")
+            fig.savefig(os.path.join(outpath, 'fmap_{}_{}.png'.format(j, datetime.today().strftime('%H:%M:%S'))),
+                        bbox_inches='tight', pad_inches=0)
 
-
+# TODO: BATCH MAKES NEW DIMENSIONAL
 def draw_table_activations(activations, outpath, nrows=3, ncols=2, figsize=(25, 25)):
     """
-    :param activations: ``Tensor[N, H, W]``
+    :param activations: ``Tensor[N, C, H, W]``
     :param outpath: path to save
     :param nrows: ``int``, numbers of rows
     :param ncols: ``int``, numbers of cols
